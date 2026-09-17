@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeShield AI</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="ext-container">
+    
+    <header class="ext-header">
+      <div class="brand-group">
+        <img src="icons/icon32.png" alt="CodeShield" class="brand-icon">
+        <div>
+          <h1 class="brand-title">CodeShield <span class="accent-text">AI</span></h1>
+          <span class="brand-subtitle">Detector & Stealth Humanizer</span>
+        </div>
+      </div>
+      <div id="backend-status" class="status-pill offline" title="Backend connection status">
+        <span class="status-dot"></span>
+        <span id="status-text">Checking...</span>
+      </div>
+    </header>
+
+    
+    <nav class="tab-nav">
+      <button class="tab-btn active" data-tab="detector">🔍 Detector</button>
+      <button class="tab-btn" data-tab="humanizer">⚡ Humanizer <span class="mini-badge">Safe</span></button>
+      <button class="tab-btn" data-tab="settings">⚙️ Settings</button>
+    </nav>
+
+    
+    <main id="tab-detector" class="tab-view active">
+      <div class="toolbar">
+        <button id="btn-grab-selection" class="btn-sm" title="Grab highlighted code from active webpage">📋 Grab Selection</button>
+        <button id="btn-detector-sample" class="btn-sm" title="Load sample AI snippet">🧪 Sample</button>
+        <button id="btn-clear-detector" class="btn-sm" title="Clear input">🗑️ Clear</button>
+      </div>
+
+      <textarea id="detector-input" class="code-box" placeholder="Paste code snippet to scan for AI signatures or click 'Grab Selection'..." spellcheck="false"></textarea>
+
+      <button id="btn-run-scan" class="btn-action btn-primary">
+        <span>🔍</span> Analyze AI Probability
+      </button>
+
+      
+      <div id="detector-results" class="results-box" style="display: none;">
+        <div class="score-header">
+          <div class="score-display">
+            <span id="res-score" class="score-number">0.0%</span>
+            <span class="score-label">AI PROBABILITY</span>
+          </div>
+          <div class="verdict-col">
+            <span id="res-verdict" class="verdict-tag">Likely Human</span>
+            <span id="res-family" class="family-tag">Generic LLM</span>
+          </div>
+        </div>
+
+        <div id="res-signals-list" class="signals-list"></div>
+
+        <button id="btn-send-to-humanizer" class="btn-action btn-secondary" style="margin-top: 10px;">
+          <span>⚡</span> Send to Humanizer (Escape Detectors)
+        </button>
+      </div>
+    </main>
+
+    
+    <main id="tab-humanizer" class="tab-view" style="display: none;">
+      <div class="persona-row">
+        <label for="ext-persona-select" class="field-label">Persona:</label>
+        <select id="ext-persona-select" class="select-field">
+          <option value="student" selected>CS Student (Safe &lt; 18%)</option>
+          <option value="senior">Senior / Production</option>
+          <option value="organic">Organic (With Scars)</option>
+        </select>
+      </div>
+
+      <textarea id="humanizer-input" class="code-box" placeholder="Paste AI-generated code to humanize..." spellcheck="false"></textarea>
+
+      <div class="button-row">
+        <button id="btn-run-humanize" class="btn-action btn-primary" style="flex: 2;">
+          <span>⚡</span> Humanize Code
+        </button>
+        <button id="btn-humanize-variation" class="btn-action btn-secondary" style="flex: 1;" title="Regenerate dynamic student variation">
+          🎲 Vary
+        </button>
+      </div>
+
+      
+      <div id="humanizer-output-box" class="results-box" style="display: none;">
+        <div class="output-stats-row">
+          <span id="ext-score-badge" class="stats-badge score-drop">AI Score: 98% ➔ 14%</span>
+          <span class="stats-badge zero-break">🛡️ AST Validated</span>
+        </div>
+
+        <pre id="humanized-code-pre" class="code-output-pre"></pre>
+
+        <div class="output-actions">
+          <button id="btn-copy-humanized" class="btn-sm btn-copy">📋 Copy Code</button>
+          <button id="btn-open-in-webapp" class="btn-sm">🌐 Open in Full App</button>
+        </div>
+      </div>
+    </main>
+
+    
+    <main id="tab-settings" class="tab-view" style="display: none;">
+      <div class="settings-group">
+        <label for="cfg-backend-url" class="field-label">CodeShield Backend URL:</label>
+        <input type="text" id="cfg-backend-url" class="input-field" value="http://127.0.0.1:8000" placeholder="http://127.0.0.1:8000">
+        <small class="field-help">Default local server: run <code>run.bat</code> or <code>python main.py</code>.</small>
+      </div>
+
+      <div class="button-row" style="margin-top: 12px;">
+        <button id="btn-save-settings" class="btn-action btn-primary">💾 Save Settings</button>
+        <button id="btn-check-backend" class="btn-action btn-secondary">🔄 Test Connection</button>
+      </div>
+
+      <div class="quick-links">
+        <a href="http://127.0.0.1:8000" target="_blank" class="ext-link">🌐 Open CodeShield Web App</a>
+      </div>
+    </main>
+
+    <footer class="ext-footer">
+      <span>CodeShield AI v2.5.0 • Academic & Commercial Protection</span>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

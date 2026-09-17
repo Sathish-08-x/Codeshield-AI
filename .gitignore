@@ -1,0 +1,19 @@
+__pycache__/
+*.py[cod]
+*.class
+
+# Local SQLite Database (auto-generated on first run)
+*.db
+*.sqlite3
+code_detector.db
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

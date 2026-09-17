@@ -1,0 +1,21 @@
+{
+  "name": "CodeShield AI — AI Code Detector & Humanizer",
+  "short_name": "CodeShield",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08090d",
+  "theme_color": "#00f0ff",
+  "description": "High-precision AI code detector and stealth humanizer for developers and students.",
+  "icons": [
+    {
+      "src": "img/icon192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "img/icon512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
