@@ -5,29 +5,19 @@ import random
 from typing import Dict, Any, List, Optional, Tuple
 from .detector import detect_ai_code, detect_language
 
-MASTER_SYSTEM_PROMPT = """You are a senior software engineer refactoring code to match realistic, idiomatic, and human-written developer habits. 
-Your task is to rewrite the input code while preserving 100% of its exact logic, behavior, performance, and API signatures.
-Apply the following transformation rules strictly:
-1. COMMENT AUDIT (Zero Pedagogical Comments):
-   - Delete all comments that explain *what* standard syntax does (e.g., remove `# loop through items`, `// return result`).
-   - Remove boilerplate docstrings on trivial or internal helper functions.
-   - If comments are kept or added, they must only explain *why* non-obvious business logic exists, domain edge cases, or temporary dev notes (e.g., `// TODO:`, `// work around legacy API response`). Keep comments sparse (maximum 1-2 per 50 lines).
-2. PRAGMATIC IDENTIFIER NAMING:
-   - Replace overly verbose, dictionary-perfect names with standard developer idioms:
-     * Examples: `sanitizedUserList` -> `users` or `userList`
-     * Examples: `currentIterationIndex` -> `idx` or `i`
-     * Examples: `temporaryBufferData` -> `buf` or `tmp`
-   - Use common industry abbreviations where appropriate (`req`, `res`, `ctx`, `err`, `cfg`, `payload`).
-3. PRUNE DEFENSIVE BOILERPLATE:
-   - Remove redundant `try-catch` blocks that merely log and rethrow errors unless specific error handling logic exists.
-   - Remove redundant type/null checks if the surrounding scope or type system already guarantees validity.
-   - Use early returns / guard clauses rather than deep, symmetric `if-else` nesting.
-4. INCREASE BURSTINESS & SYNTACTIC VARIATION:
-   - Avoid textbook, symmetric implementations. Alternate between concise language features (e.g., list comprehensions, ternary operators, destructuring) and standard procedural loops where natural.
-   - Do not write code like a CS textbook algorithm; write it like production code integrated into an existing codebase.
-5. OUTPUT CONSTRAINTS:
-   - Return ONLY the refactored code inside a single code block.
-   - Do NOT include any conversational preamble, sign-off, or markdown explanations."""
+MASTER_SYSTEM_PROMPT = """You are a senior software engineer refactoring code to match realistic, idiomatic, and human-written developer habits.
+Your task is to rewrite the input code following the 200-Rule Human Code Camouflage Framework across 10 distinct phases:
+1. Phase 1 (Rules 1-20): Variable Naming & Lexical Anomalies (inconsistent abbreviations, mixed casing, single-letter variables, domain shorthand).
+2. Phase 2 (Rules 21-40): Structural Imperfections (asymmetric branching, mild duplication, chronological function ordering, unnested logic).
+3. Phase 3 (Rules 41-60): Commenting & Psychological Fingerprints (zero pedagogical comments, strip docstrings, casual notes only).
+4. Phase 4 (Rules 61-80): Formatting, Whitespace & Typography (organic line lengths, realistic blank lines, natural spacing).
+5. Phase 5 (Rules 81-100): Logic, Control Flow & Idiom Drift (mixed loop idioms, step-by-step intermediate variables, defensive evaluations).
+6. Phase 6 (Rules 101-120): Error Handling & State Management (pragmatic error handling, realistic scope mutation, contextual checks).
+7. Phase 7 (Rules 121-140): Language-Specific Dialects (Python: procedural loops over comprehensions; JS: traditional functions; HTML/CSS: mixed classes/IDs; C++: raw buffers).
+8. Phase 8 (Rules 141-160): Cognitive Fatigue & Mid-Workflow Changes (pragmatic shortcuts, natural casing drift, variable rhythm).
+9. Phase 9 (Rules 161-180): Terminal, System & Environment Artifacts (realistic local paths, contextual parameters, mock data).
+10. Phase 10 (Rules 181-200): The Ultimate Cognitive Signatures (authentically human, slightly imperfect, functional, and organic).
+Preserve 100% of exact logic, behavior, and API contracts while modifying every word and line necessary to defeat AI detectors completely."""
 
 UNIVERSAL_SYSTEM_PROMPT = """You are an agnostic code refactoring engine. Your goal is to convert synthetic AI-generated code into natural, idiomatic human-written code.
 Assume the input may come from OpenAI, Claude, Gemini, or DeepSeek. Apply the following normalization rules to strip all model-specific fingerprints:
@@ -397,23 +387,62 @@ def humanize_html(code: str, academic_year: str = "year_1") -> Tuple[str, List[s
     changes = []
     res = code
 
+    # 1. Strip all HTML comments (<!-- ... -->) [Rule 21]
     if re.search(r'<!--[\s\S]*?-->', res):
         res = re.sub(r'<!--[\s\S]*?-->', '', res)
-        changes.append("Stripped 100% of HTML comments (<!-- ... -->)")
+        changes.append("Stripped 100% of HTML comments (<!-- ... -->) [Rule 21]")
 
-    if re.search(r'<title>.*?(?:Modern|Landing|Clean|Website).*?</title>', res, flags=re.I):
+    # 2. Naturalize Title [Rule 7]
+    if re.search(r'<title>.*?(?:Modern|Landing|Clean|Website|Platform).*?</title>', res, flags=re.I):
         res = re.sub(r'<title>.*?</title>', '<title>Home</title>', res, count=1, flags=re.I)
-        changes.append("Replaced generic AI page title with simple natural title")
+        changes.append("Replaced generic AI page title with simple natural title [Rule 7]")
 
+    # 3. Naturalize Navigation & Header [Rules 1, 2, 62]
     if 'class="nav-links"' in res:
         res = res.replace('class="nav-links"', 'class="nav-items" id="main-nav"')
-        changes.append("Replaced textbook AI 'nav-links' class with natural mixed class/ID")
+        changes.append("Replaced textbook AI 'nav-links' class with natural mixed class/ID [Rule 2]")
     if 'class="navbar"' in res:
         res = res.replace('class="navbar"', 'class="header-nav" id="top-bar"')
-        changes.append("Replaced generic 'navbar' class with contextual header identifier")
+        changes.append("Replaced generic 'navbar' class with contextual header identifier [Rule 1]")
     if '<div class="logo">Brand<span>Name</span></div>' in res:
         res = res.replace('<div class="logo">Brand<span>Name</span></div>', '<a href="/" class="logo">Brand<span>App</span></a>')
-        changes.append("Converted static div logo to realistic clickable link")
+        changes.append("Converted static div logo to realistic clickable link [Rule 62]")
+    elif '<div class="logo">Brand</div>' in res:
+        res = res.replace('<div class="logo">Brand</div>', '<a href="/" class="brand-logo">Brand</a>')
+        changes.append("Converted static div logo to realistic anchor link [Rule 62]")
+
+    # 4. Naturalize Hero / Section classes (De-BEM / De-Slop) [Rules 1, 7, 64]
+    if 'class="hero-section"' in res:
+        res = res.replace('class="hero-section"', 'id="hero" class="banner"')
+        changes.append("Replaced generic AI 'hero-section' with natural section ID & banner class [Rule 1]")
+    elif 'class="hero"' in res:
+        res = res.replace('class="hero"', 'id="intro"')
+        changes.append("Naturalized hero section identifier [Rule 7]")
+
+    if 'class="hero-title"' in res:
+        res = res.replace(' class="hero-title"', '')
+        changes.append("Removed redundant textbook class from <h1> (semantic styling) [Rule 64]")
+    if 'class="hero-description"' in res:
+        res = res.replace(' class="hero-description"', '')
+        changes.append("Removed redundant textbook class from <p> [Rule 64]")
+
+    if 'class="cta-button"' in res:
+        res = res.replace('class="cta-button"', 'class="btn-primary"')
+        changes.append("Converted generic 'cta-button' to authentic developer class 'btn-primary' [Rule 1]")
+
+    if 'class="feature-card"' in res:
+        res = res.replace('class="feature-card"', 'class="card"')
+        changes.append("Naturalized feature cards to standard human container class [Rule 7]")
+
+    if 'class="features-container"' in res:
+        res = res.replace('class="features-container"', 'class="cards-wrapper"')
+        changes.append("Replaced rigid AI container name with authentic wrapper class [Rule 8]")
+
+    # 5. Naturalize HTML root boilerplate for student personas [Rule 141]
+    if academic_year in ("year_1", "year_2", "1st_year", "2nd_year"):
+        if '<html lang="en">' in res:
+            res = res.replace('<html lang="en">', '<html>')
+            changes.append("Simplified HTML root tag for authentic beginner student profile [Rule 141]")
 
     clean_lines = [l for l in res.splitlines() if l.strip()]
     res = "\n".join(clean_lines).strip()
