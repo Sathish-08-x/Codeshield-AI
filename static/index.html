@@ -1,1536 +1,513 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CodeShield AI - Advanced AI Code Detector & Humanizer</title>
-  
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600;700&family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@300;400;500;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODESHIELD - AI Code Humanizer & De-Slop Engine</title>
+    <!-- Tailwind CSS for modern responsive layout -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Fira Code and Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #060913;
+            color: #f1f5f9;
+        }
+        .font-mono-code {
+            font-family: 'Fira Code', monospace;
+        }
+        .neon-border {
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.04);
+        }
+        .neon-border:focus-within {
+            border-color: rgba(56, 189, 248, 0.8);
+            box-shadow: 0 0 25px rgba(56, 189, 248, 0.15);
+        }
+        .glow-btn {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 100%);
+            box-shadow: 0 0 25px rgba(14, 165, 233, 0.35);
+            transition: all 0.25s ease;
+        }
+        .glow-btn:hover {
+            box-shadow: 0 0 30px rgba(14, 165, 233, 0.65);
+            transform: translateY(-1px);
+        }
+        /* Custom scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d18;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+    </style>
 </head>
-<body data-theme="cyberpunk">
+<body class="min-h-screen flex flex-col justify-between selection:bg-cyan-500 selection:text-black">
 
-  
-  <canvas id="vfx-canvas"></canvas>
+    <!-- Top Navigation Header -->
+    <header class="border-b border-slate-800 bg-[#090d18]/90 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-4 cursor-pointer" onclick="switchTab('humanizer')">
+                <div class="flex items-center space-x-2.5">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center font-extrabold text-black text-sm shadow-lg shadow-cyan-500/20">CS</div>
+                    <span class="font-extrabold tracking-wider text-lg bg-gradient-to-r from-cyan-400 via-sky-200 to-indigo-400 bg-clip-text text-transparent">CODESHIELD</span>
+                </div>
+                <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 font-mono-code hidden sm:inline-block">AI NEURAL INTELLIGENCE V3.5</span>
+            </div>
 
-  
-  <div class="ambient-glow"></div>
-  <div id="scanlines-overlay" class="scanlines"></div>
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex space-x-1 lg:space-x-2">
+                <button onclick="switchTab('detector')" id="nav-detector" class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition">AI Detector</button>
+                <button onclick="switchTab('humanizer')" id="nav-humanizer" class="px-3 py-1.5 rounded-lg text-sm font-medium text-cyan-400 bg-cyan-500/10 border border-cyan-500/20 transition flex items-center space-x-1.5">
+                    <span>Code Humanizer</span>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.2 rounded font-mono-code">STUDENT SAFE</span>
+                </button>
+                <button onclick="switchTab('matrix')" id="nav-matrix" class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition">Universal Matrix</button>
+                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-1.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800/50 transition">History & Feedback</button>
+            </nav>
 
-  
-  <div class="app-container">
-
-    
-    <header class="header-nav">
-      <a href="#" class="brand-logo" id="nav-brand-logo">
-        <div class="shield-icon">🛡️</div>
-        <div class="brand-text">
-          <h1>CodeShield AI</h1>
-          <span class="badge">Neural Intelligence v2.5</span>
+            <div class="flex items-center space-x-3">
+                <div class="text-xs text-right hidden sm:block font-mono-code">
+                    <div class="text-cyan-400 font-semibold" id="topUserCredits">3 Free Scans</div>
+                    <div class="text-slate-500">Universal Tier</div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center text-xs font-bold text-white shadow">AI</div>
+            </div>
         </div>
-      </a>
-
-      
-      <nav class="main-page-nav" id="main-page-nav">
-        <button class="page-nav-btn active" data-page="page-detector" id="nav-btn-detector">
-          <span class="nav-icon">🔍</span>
-          <span class="nav-label">AI Detector</span>
-        </button>
-        <button class="page-nav-btn" data-page="page-humanizer" id="nav-btn-humanizer">
-          <span class="nav-icon">⚡</span>
-          <span class="nav-label">Code Humanizer</span>
-          <span class="page-nav-badge">Student Safe</span>
-        </button>
-        <button class="page-nav-btn" data-page="page-matrix" id="nav-btn-matrix">
-          <span class="nav-icon">🌐</span>
-          <span class="nav-label">Universal Matrix</span>
-        </button>
-        <button class="page-nav-btn" data-page="page-history" id="nav-btn-history">
-          <span class="nav-icon">📜</span>
-          <span class="nav-label">History & Feedback</span>
-        </button>
-      </nav>
-
-      <div class="nav-actions">
-        
-        <div id="user-credits-badge" class="btn-hud" style="color: var(--accent-amber); border-color: rgba(255, 170, 0, 0.4);" title="Click to view CodeShield PRO plans">
-          <span>⚡</span> <span id="credits-count-text">5 Free Scans</span>
-        </div>
-
-        
-        <button id="btn-open-chat" class="btn-hud" title="Intake AI Consultant">
-          <span>🤖</span> AI Chat
-        </button>
-
-        <button id="btn-open-customizer" class="btn-hud" title="Customize Theme & VFX">
-          <span>🎨</span> Theme
-        </button>
-
-        <button id="sound-mute-nav-btn" class="btn-hud btn-icon-only" title="Sound FX Disabled" style="display: none;">
-          🔇
-        </button>
-      </div>
     </header>
 
-    
-    <div id="page-detector" class="app-page-view active">
-
-    
-    <section class="hero-banner" id="hero-banner-stage">
-      <div class="hero-center-content">
-        <div class="hero-pill-badge">
-          <span class="pulse-dot"></span>
-          <span class="badge-text">Next-Gen Code Stylometry &amp; Zero-Break Humanizer</span>
-        </div>
-
-        <h1 class="hero-headline">
-          Detect AI Code. <span class="gradient-text">Humanize Instantly.</span>
-        </h1>
-
-        <p class="hero-subtext">
-          High-precision statistical stylometry meets deterministic AST rewriting. Analyze syntax across <strong>9 behavioral signals</strong> (burstiness, perplexity, cyclomatic entropy) and transform ChatGPT, Claude, and Gemini code into authentic human submissions with <strong>strictly zero comments</strong> and <strong>100% runnable AST</strong>.
-        </p>
-
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col space-y-6">
         
-        <div class="hero-cta-group">
-          <button id="btn-hero-humanize" class="btn-hero-primary" title="Switch to Dedicated Code Humanizer">
-            <span class="hero-btn-icon">⚡</span>
-            <span class="hero-btn-text">Code Humanizer Studio</span>
-            <span class="hero-btn-badge">Student Safe &lt; 18%</span>
-            <span class="hero-btn-arrow">➔</span>
-          </button>
-
-          <button id="btn-hero-scan" class="btn-hero-secondary" title="Scroll down to 6-Factor AI Code Detector">
-            <span class="hero-btn-icon">🔍</span>
-            <span class="hero-btn-text">AI Detector Radar</span>
-          </button>
-
-          <button id="btn-hero-how-it-works" class="btn-hero-tertiary" title="View Universal Matrix Rules for all LLMs">
-            <span class="hero-btn-icon">🌐</span>
-            <span class="hero-btn-text">Universal Matrix</span>
-          </button>
-        </div>
-
-        
-        <div class="hero-trust-row">
-          <div class="trust-badge-item">
-            <span class="trust-icon">🎓</span>
-            <div class="trust-badge-content">
-              <span class="trust-title">Turnitin &amp; MOSS Safe</span>
-              <span class="trust-detail">&lt; 18% AI Probability</span>
-            </div>
-          </div>
-          <div class="trust-badge-item">
-            <span class="trust-icon">🛡️</span>
-            <div class="trust-badge-content">
-              <span class="trust-title">Zero-Break AST</span>
-              <span class="trust-detail">100% Runnable Syntax</span>
-            </div>
-          </div>
-          <div class="trust-badge-item">
-            <span class="trust-icon">✨</span>
-            <div class="trust-badge-content">
-              <span class="trust-title">Strictly 0 Comments</span>
-              <span class="trust-detail">Purges Step-by-Step Slop</span>
-            </div>
-          </div>
-          <div class="trust-badge-item">
-            <span class="trust-icon">⚡</span>
-            <div class="trust-badge-content">
-              <span class="trust-title">All 5 LLM Families</span>
-              <span class="trust-detail">GPT-4o, Claude, Gemini, DeepSeek</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    
-    <div class="tabs-header">
-      <button id="tab-snippet-btn" class="tab-btn active">
-        <span>🔍</span> Single File / Snippet Detector
-      </button>
-      <button id="tab-folder-btn" class="tab-btn">
-        <span>📁</span> Batch Folder Detector
-      </button>
-    </div>
-
-    
-    <div id="pane-snippet" class="workspace-card">
-      <div class="editor-toolbar">
-        <div class="toolbar-left">
-          <select id="preset-select" class="input-select">
-            <option value="" disabled selected>⚡ Load Sample AI Code to Humanize...</option>
-            <option value="student_assignment">🎓 ChatGPT College Assignment (98% AI ➔ 100% Human)</option>
-            <option value="ai_sample">🤖 Obvious AI Loops & Textbook Comments</option>
-            <option value="human_sample">👨‍💻 Idiomatic Human Code (Clean)</option>
-            <option value="mixed_sample">🔬 Mixed / AI-Assisted Code</option>
-          </select>
-
-          <select id="toolbar-scope-select" class="input-select" title="Target humanization scope">
-            <option value="whole" selected>Scope: Whole Code (Recommended for Students)</option>
-            <option value="flagged">Scope: Flagged AI Lines Only</option>
-          </select>
-
-          <select id="language-select" class="input-select">
-            <option value="auto">Language: Auto-Detect</option>
-            <option value="py">Python (.py)</option>
-            <option value="js">JavaScript (.js)</option>
-            <option value="ts">TypeScript (.ts)</option>
-            <option value="cpp">C++ (.cpp)</option>
-            <option value="java">Java (.java)</option>
-            <option value="go">Go (.go)</option>
-            <option value="rs">Rust (.rs)</option>
-            <option value="html">HTML / CSS</option>
-          </select>
-        </div>
-
-        <div class="toolbar-right">
-          <span style="font-size: 0.8rem; color: var(--accent-green); font-weight: 700;">🛡️ Triple-Pass Anti-AI Engine Ready</span>
-        </div>
-      </div>
-
-      <div class="code-editor-wrapper">
-        <textarea id="code-input" class="code-textarea" spellcheck="false" placeholder="// Paste any AI code from ChatGPT, Claude, Copilot here...
-# Step 1: Initialize accumulator
-def calculate_total_sum(data_list):
-    total_sum = 0
-    for current_item in data_list:
-        total_sum += current_item
-    return total_sum"></textarea>
-      </div>
-
-      <div class="action-trigger-bar">
-        <div class="scan-stats-pill">
-          <span>Python, JS, TS, Java, C++, Go, Rust, PHP</span>
-        </div>
-
-        <div class="editor-actions-dual">
-          
-          <button id="scan-snippet-btn" class="btn-hud btn-hud-radar btn-primary-detector" title="Run 6-Factor AI Detection Scan across 9 stylometric signals">
-            <span>🔍</span>
-            <span class="btn-main-label">ANALYZE AI PROBABILITY</span>
-            <span class="btn-sub-label">(6 Factors &bull; 9 Signals)</span>
-          </button>
-
-          
-          <button id="btn-direct-humanize" class="btn-hud btn-hud-humanize" title="Instantly Humanize Code to escape AI Detectors with zero comments">
-            <span class="btn-bolt-glow">⚡</span>
-            <span class="btn-main-label">HUMANIZE CODE NOW</span>
-            <span class="btn-sub-label">(CS Student Safe &lt; 18%)</span>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    
-    <div id="pane-folder" class="workspace-card" style="display: none;">
-      
-      <input type="file" id="folder-input" webkitdirectory directory multiple style="display: none;">
-      <input type="file" id="file-input" multiple style="display: none;">
-
-      <div id="folder-dropzone" class="folder-dropzone">
-        <div class="dropzone-icon">📁</div>
-        <div class="dropzone-text">
-          <h3>Drop your Project Folder here or Browse</h3>
-          <p>Scans full codebases recursively (.py, .js, .ts, .cpp, .java, .go, .rs, etc.)</p>
-        </div>
-        <div style="display: flex; gap: 12px; margin-top: 10px;">
-          <button type="button" id="btn-pick-folder" class="btn-hud btn-hud-primary">
-            <span>📂</span> Select Project Folder
-          </button>
-          <button type="button" id="btn-pick-files" class="btn-hud">
-            <span>📄</span> Select Files
-          </button>
-        </div>
-      </div>
-
-      <div id="folder-file-list" style="margin-top: 16px; max-height: 200px; overflow-y: auto;"></div>
-
-      <div class="action-trigger-bar">
-        <div id="folder-stats" class="scan-stats-pill">No files staged yet</div>
-        <button id="scan-folder-btn" class="btn-hud btn-hud-primary" style="display: none;">
-          <span>🚀</span> SCAN ENTIRE FOLDER
-        </button>
-      </div>
-    </div>
-
-    
-    <section id="results-section" class="results-section">
-
-      
-      <div id="humanize-alert-banner" class="humanize-alert-banner">
-        <div class="alert-left">
-          <div class="alert-icon-ring">🚨</div>
-          <div class="alert-text">
-            <h3>AI Code Detected! Should I humanize it?</h3>
-            <p>
-              Our neural heuristics detected strong AI signatures (<span id="banner-score-highlight" style="color: var(--accent-magenta); font-weight: 700;">88% AI Probability</span>).
-              Would you like us to strip robotic comments, normalize variable naming, and refactor it into human developer code?
-            </p>
-          </div>
-        </div>
-        <div class="alert-actions">
-          <button id="btn-humanize-trigger" class="btn-hud btn-hud-primary" style="padding: 14px 28px; font-size: 1rem;">
-            <span>⚡</span> HUMANIZE CODE NOW
-          </button>
-        </div>
-      </div>
-
-      
-      <div id="folder-results-pane" class="workspace-card" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-          <h3 id="project-name-display" style="font-size: 1.2rem; color: var(--accent-cyan);">Project Codebase</h3>
-          <span id="project-stats-pill" class="scan-stats-pill">0 files</span>
-        </div>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
-          Select any file below to inspect its detailed AI heatmap and humanize it:
-        </p>
-        <div id="folder-file-tree" class="file-tree-pane"></div>
-      </div>
-
-      
-      <div class="score-overview-grid">
-        
-        
-        <div class="score-card-main">
-          <div class="circular-meter">
-            <svg viewBox="0 0 160 160">
-              <circle class="meter-bg" cx="80" cy="80" r="70" />
-              <circle id="meter-fill" class="meter-fill" cx="80" cy="80" r="70" />
-            </svg>
-            <div class="meter-text">
-              <div id="score-number" class="meter-number">0%</div>
-              <div class="meter-label">AI Score</div>
-            </div>
-          </div>
-          <div id="verdict-tag" class="verdict-tag human">Calculating...</div>
-        </div>
-
-        
-        <div class="indicators-card">
-          <h3><span>🔍</span> Detected AI Markers & Signatures</h3>
-          <div id="indicators-list" class="indicators-list">
-            
-          </div>
-        </div>
-
-        
-        <div class="ai-family-card" id="ai-family-card" style="margin-top: 14px; background: rgba(10, 15, 29, 0.7); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 18px; display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span id="ai-family-icon" style="font-size: 1.5rem;">🤖</span>
-              <div>
-                <div style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px;">Likely Source AI Family</div>
-                <div id="ai-family-title" style="font-size: 1.05rem; font-weight: 700; color: #38bdf8;">OpenAI (GPT-4o / o1)</div>
-              </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span id="ai-family-confidence" class="signal-score-badge ai" style="font-size: 0.78rem;">94% Match</span>
-              <button type="button" id="btn-open-universal-matrix-card" class="btn-hud" style="font-size: 0.75rem; padding: 5px 10px;">
-                <span>🌐</span> Universal Matrix
-              </button>
-            </div>
-          </div>
-          <div id="ai-family-quirks-list" style="margin-top: 10px; display: flex; flex-direction: column; gap: 6px;">
-            
-          </div>
-        </div>
-
-      </div>
-
-      
-      <div class="workspace-card factor-matrix-card" style="margin-top: 20px;">
-        <div class="factor-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h3 style="font-size: 1.15rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px;">
-              <span>📊</span> AI Detection Matrix &amp; Stylometric Signals
-            </h3>
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">
-              Multi-metric stylometric analysis across the core dimensions, detection signals, and model normalization matrix.
-            </p>
-          </div>
-          <button type="button" id="btn-open-factor-explainer" class="btn-hud" style="font-size: 0.82rem; padding: 8px 16px;">
-            <span>📘</span> How AI Detectors Work
-          </button>
-        </div>
-
-        
-        <div style="display: flex; gap: 10px; margin-bottom: 16px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; flex-wrap: wrap;">
-          <button type="button" id="tab-factors-6" class="tab-btn active" style="padding: 6px 14px; font-size: 0.82rem;">
-            <span>📊</span> 6 Core Dimensions
-          </button>
-          <button type="button" id="tab-factors-9" class="tab-btn" style="padding: 6px 14px; font-size: 0.82rem;">
-            <span>🧬</span> 9 Detection Signals (AI vs. Human)
-          </button>
-          <button type="button" id="tab-factors-matrix" class="tab-btn" style="padding: 6px 14px; font-size: 0.82rem;">
-            <span>🌐</span> Universal AI Matrix (All Models)
-          </button>
-        </div>
-
-        <div id="six-factors-grid" class="six-factors-grid">
-          
-        </div>
-
-        <div id="nine-signals-grid" class="nine-signals-grid" style="display: none;">
-          
-        </div>
-
-        <div id="universal-matrix-grid" class="universal-matrix-grid" style="display: none;">
-          
-        </div>
-      </div>
-
-      
-      <div class="code-inspector-card">
-        <h3>
-          <span>🧬 Line-by-Line AI Heatmap Inspector</span>
-          <div class="heatmap-legend">
-            <div class="legend-item"><span class="legend-dot ai"></span> AI Line (>65%)</div>
-            <div class="legend-item"><span class="legend-dot mixed"></span> Mixed (35-65%)</div>
-            <div class="legend-item"><span class="legend-dot human"></span> Human (<35%)</div>
-          </div>
-        </h3>
-        <div id="code-heatmap-display" class="code-heatmap-display">
-          
-        </div>
-      </div>
-
-      
-      <div class="results-cta-card" style="display: flex; justify-content: space-between; align-items: center; background: linear-gradient(90deg, rgba(0, 240, 255, 0.08), rgba(139, 92, 246, 0.12)); border: 1.5px solid var(--accent-cyan); border-radius: 12px; padding: 18px 24px; margin-top: 24px; flex-wrap: wrap; gap: 16px;">
-        <div>
-          <h4 style="color: var(--accent-cyan); font-size: 1.15rem; display: flex; align-items: center; gap: 8px;">
-            <span>⚡</span> Escape AI Detection with 1-Click Code Humanizer
-          </h4>
-          <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
-            Automatically neutralize detected AI signatures, strip robotic comments, and convert to student-safe or senior production code.
-          </p>
-        </div>
-        <button id="btn-detector-to-humanizer" class="btn-hud btn-hud-primary" style="padding: 12px 26px; font-size: 0.95rem; font-weight: 800; box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);">
-          <span>⚡</span> Open in Code Humanizer Studio ➔
-        </button>
-      </div>
-
-    </section>
-    </div> 
-
-    
-    <div id="page-humanizer" class="app-page-view">
-      <section class="workspace-card humanizer-page-workspace">
-        
-        <div class="humanizer-page-hero">
-          <div class="humanizer-page-hero-left">
-            <h2 class="humanizer-page-title">
-              <span>⚡</span> Universal AI Code Humanizer &amp; De-Slop Engine
-            </h2>
-            <p class="humanizer-page-sub">
-              Neutralize AI model fingerprints from OpenAI, Claude, Gemini, DeepSeek, and Copilot into authentic, clean human code.
-            </p>
-          </div>
-          <div class="guarantees-tooltip-wrapper">
-            <button type="button" class="btn-guarantees-trigger" id="btn-guarantees-trigger" title="View CodeShield Verified Guarantees">
-              <span>🛡️</span> Verified Guarantees <span class="arrow-indicator">▾</span>
-            </button>
-            <div class="guarantees-popover" id="guarantees-popover">
-              <div class="popover-title">🛡️ CodeShield Quality Guarantees</div>
-              <ul class="popover-list">
-                <li><span class="popover-icon">🎓</span> <div><strong>Turnitin &amp; GPTZero Safe</strong><br><small>AI confidence reduced to &lt; 18%</small></div></li>
-                <li><span class="popover-icon">🛡️</span> <div><strong>Zero-Break AST Verified</strong><br><small>Compiler syntax AST validated</small></div></li>
-                <li><span class="popover-icon">✨</span> <div><strong>Strictly 0 Pedagogical Comments</strong><br><small>No textbook or robotic step notes</small></div></li>
-                <li><span class="popover-icon">⚡</span> <div><strong>Automated Safe Rollback</strong><br><small>Never breaks working logic</small></div></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div class="humanizer-controls-bar">
-          <div class="controls-main-cluster">
-            <div class="control-item">
-              <label class="control-label">STYLE PERSONA:</label>
-              <select id="page-humanize-persona-select" class="input-select" style="min-width: 220px;">
-                <option value="student" selected>🎓 CS Student / Junior (Standard Loops, Student Variables)</option>
-                <option value="senior">👨‍💻 Senior / Production (Guard Clauses, Pythonic Idioms)</option>
-                <option value="organic">🧪 Organic De-Optimization (Realistic Scars &amp; Style Drift)</option>
-                <option value="clone_style">🧬 Clone My Style (Applies Extracted Personal Habits)</option>
-              </select>
-            </div>
-
-            <div class="control-item">
-              <label class="control-label">ACADEMIC YEAR:</label>
-              <select id="page-humanize-year-select" class="input-select" style="min-width: 190px;">
-                <option value="year_1" selected>🎓 1st Year (Beginner: Step-by-Step, Loops)</option>
-                <option value="year_2">📘 2nd Year (Intermediate: Standard Logic)</option>
-                <option value="year_3">🔬 3rd Year (Advanced: Modular &amp; Libs)</option>
-                <option value="year_4">🏛️ 4th Year (Pre-Grad / Architecture)</option>
-                <option value="pro">💼 Industry Pro (Pragmatic / Scrappy)</option>
-              </select>
-            </div>
-
-            <div class="control-item">
-              <label class="control-label">PURPOSE:</label>
-              <select id="page-humanize-purpose-select" class="input-select" style="min-width: 180px;">
-                <option value="assignment" selected>📝 College Assignment / Homework</option>
-                <option value="lab_exam">🧪 Lab Exam / Practical</option>
-                <option value="project">💻 Course / Mini Project</option>
-                <option value="contest">⚡ Contest / LeetCode</option>
-                <option value="production">🏢 Production / Work</option>
-              </select>
-            </div>
-
-            <div class="control-item">
-              <label class="control-label">SCOPE:</label>
-              <select id="page-humanize-scope-select" class="input-select">
-                <option value="whole" selected>Entire Code</option>
-                <option value="flagged_only">Only Flagged AI Lines</option>
-              </select>
-            </div>
-
-            <button id="btn-page-run-humanize" class="btn-hud btn-hud-primary btn-run-humanize-glow">
-              <span>⚡</span> Humanize Code
-            </button>
-
-            <button id="btn-page-run-variation" class="btn-hud" title="Generate next unique variation for duplicate submissions">
-              <span>🎲</span> Next Variation
-            </button>
-
-            <button id="btn-page-run-sample" class="btn-hud" title="Load ChatGPT student assignment sample">
-              <span>📋</span> Load AI Sample
-            </button>
-          </div>
-
-          <div class="controls-status-cluster">
-            <div id="page-zero-break-badge" class="status-capsule ast-capsule" title="Abstract Syntax Tree Compiler Status">
-              <span>🛡️</span> AST: Validated
-            </div>
-            <div id="page-naturalness-meter-badge" class="status-capsule naturalness-capsule" title="Human Naturalness Score">
-              <span>✨</span> Naturalness: <span id="page-naturalness-val">98.4%</span>
-            </div>
-            <div id="page-score-drop-badge" class="badge-score-drop-box" title="AI Probability Before &amp; After">
-              AI Score: <span style="color: var(--accent-magenta);">88%</span> ➔ <span style="color: #34d399;">12%</span> (<span style="color: #10b981;">-76%</span>)
-            </div>
-          </div>
-        </div>
-
-        <div class="humanizer-split-grid">
-          
-          <div class="code-pane-box original-pane">
-            <div class="pane-top-header">
-              <span class="pane-title magenta-text">ORIGINAL AI-GENERATED CODE</span>
-              <div class="pane-actions-row">
-                <button id="btn-page-clear-original" class="pane-mini-btn">Clear</button>
-                <span class="pane-char-count" id="page-original-char-count" style="font-size: 0.78rem; color: var(--text-muted);">0 lines</span>
-              </div>
-            </div>
-            <textarea id="page-original-code-input" class="humanizer-code-textarea" placeholder="Paste your AI-generated code here (e.g. from ChatGPT, Claude, Gemini, DeepSeek, Copilot)..."></textarea>
-          </div>
-
-          <div class="code-pane-box output-pane">
-            <div class="pane-top-header">
-              <span class="pane-title green-text">HUMANIZED IDIOMATIC CODE (ZERO SLOP)</span>
-              <div class="pane-actions-row">
-                <button id="btn-page-rescan-output" class="pane-mini-btn"><span>🔄</span> Re-scan in Detector</button>
-                <button id="btn-page-copy-output" class="pane-mini-btn btn-accent-copy"><span>📋</span> Copy Code</button>
-                <button id="btn-page-download-output" class="pane-mini-btn btn-accent-download"><span>💾</span> Download Clean File</button>
-              </div>
-            </div>
-            <div id="page-humanized-code-output" class="humanizer-code-output">
-              <div class="output-placeholder">
-                <div style="font-size: 1.15rem; color: var(--text-primary); font-weight: 700;">⚡ Ready to Humanize</div>
-                <div style="font-size: 0.85rem; color: var(--text-secondary); max-width: 420px; margin-top: 8px; line-height: 1.5;">
-                  Paste code on the left and click <strong>Humanize Code</strong>. The engine guarantees 0 pedagogical comments, valid compiler AST, and &lt;18% AI score.
+        <!-- ========================================================================= -->
+        <!-- TAB 1: CODE HUMANIZER & DE-SLOP ENGINE (DEFAULT)                          -->
+        <!-- ========================================================================= -->
+        <div id="view-humanizer" class="flex flex-col space-y-6">
+            <!-- Top Banner Header -->
+            <div class="bg-gradient-to-r from-slate-900 via-[#0b1329] to-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+                <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute right-20 top-5 w-40 h-40 bg-purple-500/5 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                    <div>
+                        <div class="flex items-center space-x-2 text-cyan-400 mb-1.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            <span class="text-xs font-mono-code uppercase tracking-wider font-semibold">Universal AI Code Humanizer & De-Slop Engine</span>
+                        </div>
+                        <h1 class="text-lg sm:text-2xl font-bold text-white tracking-tight">Neutralize AI model fingerprints from OpenAI, Claude, Gemini, DeepSeek, and Copilot into authentic, clean human code.</h1>
+                    </div>
+                    <div class="flex items-center space-x-2 self-start md:self-auto">
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            <span class="w-1.5 h-1.5 mr-1.5 rounded-full bg-emerald-400 animate-ping"></span> Verified Guarantees
+                        </span>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
-        </div>
 
-        <div id="page-triple-audit-box" class="triple-audit-box collapsible-audit-box" style="margin-top: 14px;">
-          <div class="audit-box-header" id="btn-toggle-audit-box">
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <span class="audit-header-title">
-                🛡️ Multi-Pass Self-Audit Pipeline
-              </span>
-              <span class="audit-header-sub">
-                (Recursive 3-Pass Refinement)
-              </span>
+            <!-- Configuration Controls Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 bg-slate-900/60 backdrop-blur border border-slate-800 rounded-xl p-4">
+                
+                <!-- Style Persona -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Style Persona</label>
+                    <select id="personaSelect" class="w-full bg-[#060913] border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code">
+                        <option value="student">👨‍💻 CS Student / Junior (Standard Loops, Student Variables)</option>
+                        <option value="senior">🚀 Senior Developer / Pragmatic & Clean</option>
+                        <option value="hacker">⚡ Self-Taught Hacker (Compact, Dense, Direct)</option>
+                        <option value="enterprise">🏢 Enterprise Java/TS (Strict Types, Verbose)</option>
+                    </select>
+                </div>
+
+                <!-- Academic Year -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Academic Year</label>
+                    <select id="levelSelect" class="w-full bg-[#060913] border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code">
+                        <option value="y1">1st Year (Beginner: Step-by-Step, Loops)</option>
+                        <option value="y2">2nd Year (Sophomore: Data Structures)</option>
+                        <option value="y3">3rd Year (Junior: Advanced Algorithms)</option>
+                        <option value="grad">Graduate / Senior Professional</option>
+                    </select>
+                </div>
+
+                <!-- Purpose & Scope -->
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">Purpose & Scope</label>
+                    <div class="grid grid-cols-2 gap-2">
+                        <select id="purposeSelect" class="bg-[#060913] border border-slate-700 rounded-lg px-2.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code">
+                            <option value="homework">College Homework</option>
+                            <option value="personal">Personal Project</option>
+                            <option value="production">Production</option>
+                        </select>
+                        <select id="scopeSelect" class="bg-[#060913] border border-slate-700 rounded-lg px-2.5 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code">
+                            <option value="entire">Entire Code</option>
+                            <option value="functions">Functions Only</option>
+                            <option value="comments">Comments & Naming</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Action Buttons Group -->
+                <div class="flex flex-col justify-end space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="nextVariation()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-lg text-xs font-semibold py-2.5 px-2 transition flex items-center justify-center space-x-1">
+                            <span>Next Variation</span>
+                        </button>
+                        <button onclick="loadAISample()" class="bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 rounded-lg text-xs font-semibold py-2.5 px-2 transition flex items-center justify-center space-x-1">
+                            <span>Load AI Sample</span>
+                        </button>
+                    </div>
+                    <button onclick="humanizeCode()" id="humanizeBtn" class="w-full glow-btn text-black font-bold py-2.5 px-4 rounded-lg text-xs sm:text-sm flex items-center justify-center space-x-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        <span>Humanize Code</span>
+                    </button>
+                </div>
+
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
-              <div id="page-audit-escape-badge" class="badge-escaped">
-                <span>🛡️</span> ESCAPED AI DETECTORS (&lt; 18%)
-              </div>
+
+            <!-- Dynamic Metrics Bar -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-3 flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-cyan-500/10 text-cyan-400 flex items-center justify-center font-bold text-xs">✓</div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">AST Integrity</div>
+                        <div class="text-xs font-bold text-cyan-300 font-mono-code" id="statAst">Zero-Break AST: Validated</div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-3 flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center font-bold text-xs">📊</div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Naturalness Score</div>
+                        <div class="text-xs font-bold text-emerald-400 font-mono-code" id="statNatural">Naturalness: 98.5%</div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-3 col-span-2 sm:col-span-1 flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center font-bold text-xs">⚡</div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">AI Score Delta</div>
+                        <div class="text-xs font-bold text-purple-300 font-mono-code" id="statScore">AI Score: 58.2% → 27.5% (-30.7%)</div>
+                    </div>
+                </div>
+                <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-3 flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs">🔒</div>
+                    <div>
+                        <div class="text-[10px] text-slate-400 uppercase font-semibold">Bypass Status</div>
+                        <div class="text-xs font-bold text-blue-300 font-mono-code" id="statBypass">Undetectable / Safe</div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <div id="page-audit-steps-grid" class="audit-steps-grid">
-            
-          </div>
-        </div>
 
-        <div class="naturalizations-box" style="margin-top: 14px;">
-          <div class="naturalizations-title">
-            Automated Naturalizations Applied:
-          </div>
-          <div id="page-changes-tag-list" class="changes-tag-list"></div>
-        </div>
-      </section>
-    </div>
+            <!-- Two-Panel Workspace -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-[460px]">
+                
+                <!-- Left Workspace: Original AI Code -->
+                <div class="flex flex-col bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden neon-border shadow-2xl">
+                    <div class="bg-slate-950/80 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                            <span class="text-xs font-bold text-slate-300 ml-2 font-mono-code uppercase">Original AI-Generated Code</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="clearOriginalCode()" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800/50 hover:bg-slate-800 transition">Clear</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 relative flex flex-col">
+                        <textarea id="originalCodeInput" oninput="updateOriginalStats()" placeholder="Paste your AI-generated code here (OpenAI, Claude, Gemini, DeepSeek)..." class="w-full flex-1 bg-transparent p-4 font-mono-code text-xs sm:text-sm text-slate-300 focus:outline-none resize-none leading-relaxed min-h-[360px]"></textarea>
+                    </div>
+                    <div class="bg-slate-950/50 px-4 py-2 border-t border-slate-800/60 text-[11px] text-slate-500 flex justify-between font-mono-code">
+                        <span id="originalStats">28 lines · 654 chars</span>
+                        <span id="originalAiDetected" class="text-amber-400/90">AI Signature Detected: 74.2%</span>
+                    </div>
+                </div>
 
-    
-    <div id="page-matrix" class="app-page-view">
-      
-      <section class="workspace-card" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 12px;">
-          <div>
-            <h2 style="font-size: 1.4rem; font-family: 'Orbitron', var(--font-main); color: var(--accent-cyan); display: flex; align-items: center; gap: 10px;">
-              <span>🌐</span> Universal AI Normalization Matrix
-            </h2>
-            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
-              Neutralizes distinct stylometric signatures and coding habits across all major AI model families.
-            </p>
-          </div>
-          <button id="btn-matrix-view-prompt" class="btn-hud" style="font-size: 0.82rem;">
-            <span>📜</span> View Master System Prompt
-          </button>
-        </div>
+                <!-- Right Workspace: Humanized Idiomatic Code -->
+                <div class="flex flex-col bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden neon-border shadow-2xl">
+                    <div class="bg-slate-950/80 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></div>
+                            <span class="text-xs font-bold text-cyan-300 font-mono-code uppercase">Humanised Idiomatic Code (Zero Slop)</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="rescanCode()" class="text-xs text-emerald-400 hover:text-emerald-300 px-2.5 py-1 rounded bg-emerald-950/40 border border-emerald-500/30 transition flex items-center space-x-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>Re-scan in Detector</span>
+                            </button>
+                            <button onclick="copyHumanizedCode()" class="text-xs text-slate-300 hover:text-white px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 transition flex items-center space-x-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                                <span>Copy</span>
+                            </button>
+                            <button onclick="downloadCleanFile()" class="text-xs text-slate-300 hover:text-white px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 transition">Download</button>
+                        </div>
+                    </div>
+                    <div class="flex-1 relative flex flex-col">
+                        <textarea id="humanizedCodeOutput" readonly class="w-full flex-1 bg-[#04060b] p-4 font-mono-code text-xs sm:text-sm text-emerald-300/90 focus:outline-none resize-none leading-relaxed min-h-[360px]" placeholder="Click 'Humanize Code' to neutralize AI model signatures..."></textarea>
+                    </div>
+                    <div class="bg-slate-950/50 px-4 py-2 border-t border-slate-800/60 text-[11px] text-slate-500 flex justify-between font-mono-code">
+                        <span id="humanizedStats">39 lines · 892 chars</span>
+                        <span id="humanizedAuthenticity" class="text-emerald-400 font-semibold">Human Authenticity: 98.5% (Zero Slop)</span>
+                    </div>
+                </div>
 
-        <div id="page-matrix-grid" class="universal-matrix-grid">
-          
-        </div>
-      </section>
-
-      
-      <section class="workspace-card" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h2 style="font-size: 1.3rem; color: #a78bfa; display: flex; align-items: center; gap: 10px;">
-              <span>🧬</span> Clone My Personal Style Studio
-            </h2>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
-              Paste 1–3 code snippets you wrote yourself. Our engine extracts your casing, indentation width, and quote preferences to mirror your personal habits onto AI-generated code.
-            </p>
-          </div>
-          <div style="display: flex; gap: 10px;">
-            <button type="button" id="btn-matrix-load-demo-style" class="btn-hud" style="font-size: 0.8rem;">
-              <span>📋</span> Load Sample Profile
-            </button>
-            <button type="button" id="btn-matrix-extract-style" class="btn-hud btn-hud-primary" style="font-size: 0.8rem;">
-              <span>⚡</span> Extract My Habits
-            </button>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 16px;">
-          <textarea id="page-clone-style-input" class="humanizer-code-textarea" rows="6" style="min-height: 140px; background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;" placeholder="// Paste 1-3 functions you wrote previously here...&#10;const getUser = (id) => {&#10;  return db.find(id);&#10;};"></textarea>
-        </div>
-
-        
-        <div id="page-extracted-style-box" style="background: rgba(139, 92, 246, 0.08); border: 1px solid #8b5cf6; border-radius: 10px; padding: 16px; display: none;">
-          <h4 style="color: #c084fc; font-size: 0.95rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-            <span>✨</span> Extracted Personal Coding Habits:
-          </h4>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; font-size: 0.85rem;">
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;">
-              <span style="color: var(--text-muted); font-size: 0.75rem;">CASING PREFERENCE</span>
-              <div id="page-style-casing-val" style="color: #38bdf8; font-weight: 700; margin-top: 4px;">snake_case</div>
             </div>
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;">
-              <span style="color: var(--text-muted); font-size: 0.75rem;">INDENTATION WIDTH</span>
-              <div id="page-style-indent-val" style="color: #34d399; font-weight: 700; margin-top: 4px;">4 spaces</div>
-            </div>
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;">
-              <span style="color: var(--text-muted); font-size: 0.75rem;">QUOTES CONVENTION</span>
-              <div id="page-style-quotes-val" style="color: #f472b6; font-weight: 700; margin-top: 4px;">single quotes (')</div>
-            </div>
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px;">
-              <span style="color: var(--text-muted); font-size: 0.75rem;">COMMENT DENSITY</span>
-              <div id="page-style-comments-val" style="color: #fbbf24; font-weight: 700; margin-top: 4px;">none (clean)</div>
-            </div>
-          </div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 14px; flex-wrap: wrap; gap: 10px;">
-            <div id="page-style-summary-text" style="font-size: 0.82rem; color: #d1fae5; font-weight: 600;"></div>
-            <button id="btn-page-apply-cloned-style" class="btn-hud btn-hud-primary" style="padding: 8px 18px; font-size: 0.85rem;">
-              <span>🚀</span> Apply As Active Humanizer Persona
-            </button>
-          </div>
-        </div>
-      </section>
-
-      
-      <section class="workspace-card" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 style="font-size: 1.15rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 8px;">
-              <span>📜</span> Master System Prompt for Senior De-Slop Refactoring
-            </h3>
-            <p style="color: var(--text-secondary); font-size: 0.82rem; margin-top: 4px;">
-              Copy this system prompt into external LLMs or your local agent pipelines to ensure zero slop.
-            </p>
-          </div>
-          <button id="btn-copy-embedded-master-prompt" class="btn-hud" style="font-size: 0.82rem;">
-            <span>📋</span> Copy Prompt
-          </button>
-        </div>
-        <div id="embedded-master-prompt-box" style="background: rgba(0, 0, 0, 0.45); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; font-family: var(--font-main); font-size: 0.82rem; color: #cbd5e1; white-space: pre-wrap; line-height: 1.6; max-height: 320px; overflow-y: auto;">
-You are a senior software engineer refactoring code to match realistic, idiomatic, and human-written developer habits. 
-Your task is to rewrite the input code while preserving 100% of its exact logic, behavior, performance, and API signatures.
-Apply the following transformation rules strictly:
-1. COMMENT AUDIT (Zero Pedagogical Comments):
-   - Delete all comments that explain *what* standard syntax does (e.g., remove # loop through items, // return result).
-   - Remove boilerplate docstrings on trivial or internal helper functions.
-   - If comments are kept or added, they must only explain *why* non-obvious business logic exists, domain edge cases, or temporary dev notes (e.g., // TODO:, // work around legacy API response). Keep comments sparse (maximum 1-2 per 50 lines).
-2. PRAGMATIC IDENTIFIER NAMING:
-   - Replace overly verbose, dictionary-perfect names with standard developer idioms:
-     * Examples: sanitizedUserList -> users or userList
-     * Examples: currentIterationIndex -> idx or i
-     * Examples: temporaryBufferData -> buf or tmp
-   - Use common industry abbreviations where appropriate (req, res, ctx, err, cfg, payload).
-3. PRUNE DEFENSIVE BOILERPLATE:
-   - Remove redundant try-catch blocks that merely log and rethrow errors unless specific error handling logic exists.
-   - Remove redundant type/null checks if the surrounding scope or type system already guarantees validity.
-   - Use early returns / guard clauses rather than deep, symmetric if-else nesting.
-4. INCREASE BURSTINESS & SYNTACTIC VARIATION:
-   - Avoid textbook, symmetric implementations. Alternate between concise language features (e.g., list comprehensions, ternary operators, destructuring) and standard procedural loops where natural.
-   - Do not write code like a CS textbook algorithm; write it like production code integrated into an existing codebase.
-5. OUTPUT CONSTRAINTS:
-   - Return ONLY the refactored code inside a single code block.
-   - Do NOT include any conversational preamble, sign-off, or markdown explanations.</div>
-      </section>
-    </div>
-
-    
-    <div id="page-history" class="app-page-view">
-      
-      <section class="workspace-card" style="padding: 24px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h2 style="font-size: 1.35rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 10px;">
-              <span>📜</span> Neural Scan &amp; Humanizer Audit History
-            </h2>
-            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 4px;">
-              Inspect past scans, reload code into detector or humanizer, and monitor score reductions.
-            </p>
-          </div>
-          <button id="btn-refresh-history" class="btn-hud" style="font-size: 0.82rem;">
-            <span>🔄</span> Refresh History
-          </button>
         </div>
 
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--border-color); color: var(--accent-cyan);">
-                <th style="padding: 10px;">ID</th>
-                <th style="padding: 10px;">Project / Snippet</th>
-                <th style="padding: 10px;">Type</th>
-                <th style="padding: 10px;">AI Score</th>
-                <th style="padding: 10px;">Date</th>
-                <th style="padding: 10px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="page-history-table-body">
-              
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      
-      <section class="workspace-card scope-calc-card">
-        <div class="calc-header-row">
-          <h3 class="calc-title">CMS PRICING &amp; CODEBASE SCOPE CALCULATOR</h3>
-          <span class="calc-live-pill" id="calc-badge-status">Free Tier Active (5 Scans)</span>
-        </div>
-        
-        <div class="calc-grid-preview">
-          <div class="calc-box-clean">
-            <div class="calc-box-title">Page Count / Files</div>
-            <div class="capsule-slider-track">
-              <input type="range" id="calc-file-slider" class="capsule-slider-clean" min="1" max="50" value="1">
+        <!-- ========================================================================= -->
+        <!-- TAB 2: AI CODE DETECTOR                                                  -->
+        <!-- ========================================================================= -->
+        <div id="view-detector" class="hidden flex flex-col space-y-6">
+            <div class="bg-gradient-to-r from-slate-900 via-[#0b1329] to-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 relative z-10">
+                    <div>
+                        <div class="flex items-center space-x-2 text-cyan-400 mb-1.5">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                            <span class="text-xs font-mono-code uppercase tracking-wider font-semibold">High-Precision Stylometry Radar Scanner</span>
+                        </div>
+                        <h1 class="text-lg sm:text-2xl font-bold text-white tracking-tight">Evaluate code across 9 behavioral stylometric signals: Perplexity, Burstiness, AST Symmetry, and Cyclomatic Entropy.</h1>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="runDetectorScan()" id="btnDetectorScan" class="glow-btn text-black font-bold py-2.5 px-5 rounded-lg text-xs sm:text-sm flex items-center space-x-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <span>Run AI Radar Scan</span>
+                        </button>
+                    </div>
+                </div>
             </div>
-            <div class="calc-center-number" id="calc-file-val">1</div>
-          </div>
 
-          <div class="calc-box-clean">
-            <div class="calc-box-title">Unique Concepts</div>
-            <div class="capsule-stepper-pink">
-              <button type="button" class="pink-step-btn minus" id="calc-pass-minus">−</button>
-              <button type="button" class="pink-step-btn plus active" id="calc-pass-plus">+</button>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Code Input for Detector -->
+                <div class="lg:col-span-2 flex flex-col bg-slate-900/80 border border-slate-800 rounded-xl overflow-hidden neon-border shadow-2xl">
+                    <div class="bg-slate-950/80 px-4 py-3 border-b border-slate-800 flex items-center justify-between">
+                        <span class="text-xs font-bold text-slate-300 font-mono-code uppercase">Code Snippet to Scan</span>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="loadSampleToDetector()" class="text-xs text-cyan-400 hover:text-white px-2 py-1 rounded bg-slate-800/50 hover:bg-slate-800 transition">Load AI Sample</button>
+                            <button onclick="document.getElementById('detectorCodeInput').value='';" class="text-xs text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800/50 hover:bg-slate-800 transition">Clear</button>
+                        </div>
+                    </div>
+                    <textarea id="detectorCodeInput" placeholder="Paste snippet to inspect for AI signatures..." class="w-full flex-1 bg-transparent p-4 font-mono-code text-xs sm:text-sm text-slate-300 focus:outline-none resize-none leading-relaxed min-h-[380px]"></textarea>
+                </div>
+
+                <!-- Detector Results Card -->
+                <div class="flex flex-col bg-slate-900/80 border border-slate-800 rounded-xl p-5 space-y-5">
+                    <div class="border-b border-slate-800 pb-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono-code">Stylometric Verdict</span>
+                        <div class="mt-2 flex items-baseline space-x-3">
+                            <span id="detScoreVal" class="text-4xl font-extrabold text-rose-400 font-mono-code">82.4%</span>
+                            <span id="detVerdictBadge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono-code">AI-GENERATED</span>
+                        </div>
+                        <p id="detVerdictDesc" class="text-xs text-slate-400 mt-2">Low burstiness and textbook comment structures detected. Extremely likely generated by ChatGPT / Claude.</p>
+                    </div>
+
+                    <div class="space-y-3">
+                        <span class="text-xs font-bold text-slate-400 uppercase tracking-wider font-mono-code">9-Signal Breakdown</span>
+                        
+                        <div class="space-y-2 text-xs font-mono-code">
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Perplexity & Token Entropy</span>
+                                    <span id="sigPerp" class="text-rose-400">18.2 / 100</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5"><div id="barPerp" class="bg-rose-500 h-1.5 rounded-full" style="width: 18%"></div></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Burstiness & Line Variation</span>
+                                    <span id="sigBurst" class="text-rose-400">22.0 / 100</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5"><div id="barBurst" class="bg-rose-500 h-1.5 rounded-full" style="width: 22%"></div></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>AST Structural Symmetry</span>
+                                    <span id="sigAst" class="text-amber-400">76.5 / 100</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5"><div id="barAst" class="bg-amber-500 h-1.5 rounded-full" style="width: 76%"></div></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Docstring / Comment Politeness</span>
+                                    <span id="sigComment" class="text-rose-400">92.0 / 100</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5"><div id="barComment" class="bg-rose-500 h-1.5 rounded-full" style="width: 92%"></div></div>
+                            </div>
+
+                            <div>
+                                <div class="flex justify-between text-slate-400 mb-1">
+                                    <span>Naming Convention Uniformity</span>
+                                    <span id="sigNaming" class="text-rose-400">84.0 / 100</span>
+                                </div>
+                                <div class="w-full bg-slate-800 rounded-full h-1.5"><div id="barNaming" class="bg-rose-500 h-1.5 rounded-full" style="width: 84%"></div></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="sendDetectorToHumanizer()" class="w-full mt-auto py-2.5 px-4 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-lg text-xs font-bold transition flex items-center justify-center space-x-2">
+                        <span>⚡ Send to Code Humanizer</span>
+                    </button>
+                </div>
             </div>
-            <div class="calc-center-number" id="calc-pass-display">1</div>
-          </div>
         </div>
 
-        <div class="calc-sub-grid">
-          <div class="calc-sub-card active" id="calc-opt-dev">
-            <span>Include Development</span>
-          </div>
-          <div class="calc-sub-card active" id="calc-opt-comments">
-            <span>Strict Zero-Comment Mode</span>
-          </div>
-          <div class="calc-sub-card active" id="calc-opt-escape">
-            <span>Escape AI Detectors</span>
-          </div>
-          <div class="calc-sub-card price-result" id="calc-opt-price">
-            <span class="price-val" id="calc-total-cost">₹0 Free (First 5 Tries)</span>
-          </div>
+        <!-- ========================================================================= -->
+        <!-- TAB 3: UNIVERSAL MATRIX                                                  -->
+        <!-- ========================================================================= -->
+        <div id="view-matrix" class="hidden flex flex-col space-y-6">
+            <div class="bg-gradient-to-r from-slate-900 via-[#0b1329] to-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+                <div class="flex items-center space-x-2 text-cyan-400 mb-1.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <span class="text-xs font-mono-code uppercase tracking-wider font-semibold">200-Rule Camouflage Framework & Normalizer Matrix</span>
+                </div>
+                <h1 class="text-lg sm:text-2xl font-bold text-white tracking-tight">The 4 Master Pillars to defeat AI Code Detectors (CodeSpy, Blaxel, Turnitin, MOSS).</h1>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                    <div class="text-cyan-400 font-bold text-sm font-mono-code">01. Wipe Out AI Signatures</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Strip textbook section headers (// UI Logic:, // Pipeline Logic:), delete polite tutorial commentary, and eliminate AI design systems.</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                    <div class="text-cyan-400 font-bold text-sm font-mono-code">02. Lexical Entropy Injection</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Replace dictionary-perfect names (`streamReader`, `userPromptText`, `dispatchButton`) with authentic developer shorthand (`f`, `userInput`, `btn`).</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                    <div class="text-cyan-400 font-bold text-sm font-mono-code">03. Mixed Syntax Eras</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Switch modern `const` declarations back to `var` in parts of scripts out of old-school muscle memory. Break uniform mathematical symmetry.</p>
+                </div>
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-4 space-y-2">
+                    <div class="text-cyan-400 font-bold text-sm font-mono-code">04. Scrappy Artifacts</div>
+                    <p class="text-xs text-slate-400 leading-relaxed">Inject authentic developer artifacts (`// FIXME: api key exposed`, `// quick fix for submission`) and blunt frustrated error strings.</p>
+                </div>
+            </div>
+
+            <div class="bg-slate-900/40 border border-slate-800 rounded-xl p-6 space-y-4">
+                <h3 class="text-sm font-bold text-white font-mono-code uppercase">Master Normalizer Matrix Configuration</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs font-mono-code text-slate-300">
+                        <thead class="text-slate-400 border-b border-slate-800 uppercase bg-slate-950/40">
+                            <tr>
+                                <th class="p-3">Detector Signature</th>
+                                <th class="p-3">AI Default Pattern</th>
+                                <th class="p-3">CodeShield Humanized Transformation</th>
+                                <th class="p-3">Target Entropy Delta</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60">
+                            <tr>
+                                <td class="p-3 text-cyan-400 font-semibold">Variable Naming</td>
+                                <td class="p-3 text-rose-300">`userPromptText`, `dispatchButton`</td>
+                                <td class="p-3 text-emerald-300">`userInput`, `btn`, `txtInput`</td>
+                                <td class="p-3 text-emerald-400">+64% Perplexity</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 text-cyan-400 font-semibold">CSS Design System</td>
+                                <td class="p-3 text-rose-300">CSS variables, soft box-shadows</td>
+                                <td class="p-3 text-emerald-300">Harsh `#111`, monospace, `#e53e3e` button</td>
+                                <td class="p-3 text-emerald-400">+82% Naturalness</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 text-cyan-400 font-semibold">Comment Headers</td>
+                                <td class="p-3 text-rose-300">`// UI Logic:`, `// Event listener...`</td>
+                                <td class="p-3 text-emerald-300">Completely stripped / `// quick fix for submission`</td>
+                                <td class="p-3 text-emerald-400">-100% AI Boilerplate</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 text-cyan-400 font-semibold">Variable Eras</td>
+                                <td class="p-3 text-rose-300">100% strict `const` immutability</td>
+                                <td class="p-3 text-emerald-300">Mixed `const` and `var` legacy patterns</td>
+                                <td class="p-3 text-emerald-400">+45% Burstiness</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 text-cyan-400 font-semibold">Error Messages</td>
+                                <td class="p-3 text-rose-300">"An unexpected runtime fault occurred"</td>
+                                <td class="p-3 text-emerald-300">"Error: no image selected!", "Something broke!"</td>
+                                <td class="p-3 text-emerald-400">+55% Entropy</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-      </section>
 
-      
-      <section class="workspace-card feedback-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <h3 style="font-size: 1.25rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 10px;">
-              <span>💬</span> Feedback &amp; Query Portal
-            </h3>
-            <p style="color: var(--text-secondary); font-size: 0.88rem; margin-top: 4px;">
-              Have a question, feedback, or found an AI pattern we should add? Send your query directly to our team!
-            </p>
-          </div>
-          <div id="star-rating-box" class="star-rating-box">
-            <span class="star-rating-item active" data-star="1">★</span>
-            <span class="star-rating-item active" data-star="2">★</span>
-            <span class="star-rating-item active" data-star="3">★</span>
-            <span class="star-rating-item active" data-star="4">★</span>
-            <span class="star-rating-item active" data-star="5">★</span>
-          </div>
+        <!-- ========================================================================= -->
+        <!-- TAB 4: HISTORY & FEEDBACK                                                -->
+        <!-- ========================================================================= -->
+        <div id="view-history" class="hidden flex flex-col space-y-6">
+            <div class="bg-gradient-to-r from-slate-900 via-[#0b1329] to-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden shadow-2xl">
+                <div class="flex items-center space-x-2 text-cyan-400 mb-1.5">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span class="text-xs font-mono-code uppercase tracking-wider font-semibold">Scan Records & Platform Feedback</span>
+                </div>
+                <h1 class="text-lg sm:text-2xl font-bold text-white tracking-tight">Track previous stylometric transformations and submit feature requests.</h1>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Recent Scans -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <span class="text-xs font-bold text-slate-300 font-mono-code uppercase">Recent Transformations</span>
+                        <button onclick="fetchHistory()" class="text-xs text-cyan-400 hover:text-white transition">Refresh</button>
+                    </div>
+                    <div id="historyList" class="space-y-2 text-xs font-mono-code text-slate-400">
+                        <div class="p-3 bg-slate-950/40 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <div class="text-slate-200 font-semibold">task_automation.html</div>
+                                <div class="text-[10px] text-slate-500">AI Score: 74.2% → 12.0% (-62.2%)</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">SAFE</span>
+                        </div>
+                        <div class="p-3 bg-slate-950/40 rounded-lg border border-slate-800/80 flex justify-between items-center">
+                            <div>
+                                <div class="text-slate-200 font-semibold">calculate_discount.js</div>
+                                <div class="text-[10px] text-slate-500">AI Score: 88.5% → 14.5% (-74.0%)</div>
+                            </div>
+                            <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px]">SAFE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Form -->
+                <div class="bg-slate-900/60 border border-slate-800 rounded-xl p-5 space-y-4">
+                    <span class="text-xs font-bold text-slate-300 font-mono-code uppercase">Submit Developer Feedback</span>
+                    <form onsubmit="submitFeedback(event)" class="space-y-3">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 font-mono-code uppercase mb-1">Your Name</label>
+                            <input type="text" id="fbName" required placeholder="Developer Name" class="w-full bg-[#060913] border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 font-mono-code uppercase mb-1">Email (Optional)</label>
+                            <input type="email" id="fbEmail" placeholder="developer@example.com" class="w-full bg-[#060913] border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 font-mono-code uppercase mb-1">Feedback / Feature Request</label>
+                            <textarea id="fbMsg" required rows="3" placeholder="Share your experience with Turnitin, CodeSpy, or stylometric evasion..." class="w-full bg-[#060913] border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-cyan-500 font-mono-code resize-none"></textarea>
+                        </div>
+                        <button type="submit" class="w-full glow-btn text-black font-bold py-2.5 px-4 rounded-lg text-xs font-mono-code transition">
+                            Submit Feedback
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
 
-        <form id="feedback-form">
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 14px;">
-            <div>
-              <label class="control-label" style="margin-bottom: 6px;">Your Name</label>
-              <input type="text" id="fb-name" class="input-select" placeholder="e.g. Alex Chen" required style="width: 100%;">
-            </div>
-            <div>
-              <label class="control-label" style="margin-bottom: 6px;">Email (Optional)</label>
-              <input type="email" id="fb-email" class="input-select" placeholder="alex@example.com" style="width: 100%;">
-            </div>
-            <div>
-              <label class="control-label" style="margin-bottom: 6px;">Category</label>
-              <select id="fb-category" class="input-select" style="width: 100%;">
-                <option value="Feedback" selected>💡 General Feedback</option>
-                <option value="Query">❓ Question / Query</option>
-                <option value="Bug Report">🐛 Bug Report</option>
-                <option value="Feature Request">✨ Feature Request</option>
-              </select>
-            </div>
-          </div>
+    </main>
 
-          <div style="margin-bottom: 16px;">
-            <label class="control-label" style="margin-bottom: 6px;">Message / Query Details</label>
-            <textarea id="fb-message" class="input-select" rows="3" placeholder="Write your feedback, question, or suggestions here..." required style="width: 100%; resize: vertical;"></textarea>
-          </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
-            <span id="fb-status-msg" style="font-size: 0.88rem; color: var(--accent-green); font-weight: 600;"></span>
-            <button type="submit" id="btn-submit-fb" class="btn-hud btn-hud-primary">
-              <span>📨</span> Submit Feedback / Query
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>
-
-    
-    <footer class="app-footer">
-      <div class="app-footer-brand">
-        <span>🛡️</span> CodeShield AI &bull; Neural Intelligence v2.5
-      </div>
-      <div class="app-footer-links">
-        <a href="#detector" class="footer-nav-link" data-page="page-detector">AI Detector</a>
-        <span>&bull;</span>
-        <a href="#humanizer" class="footer-nav-link" data-page="page-humanizer">Code Humanizer</a>
-        <span>&bull;</span>
-        <a href="#matrix" class="footer-nav-link" data-page="page-matrix">Universal Matrix</a>
-        <span>&bull;</span>
-        <a href="#history" class="footer-nav-link" data-page="page-history">History &amp; Feedback</a>
-      </div>
-      <div class="app-footer-tagline">
-        Zero-Break AST Verified &bull; Strict Zero Pedagogical Comments &bull; Turnitin &amp; GPTZero Safe
-      </div>
+    <footer class="border-t border-slate-800 bg-[#060913] py-4 text-center text-xs text-slate-500">
+        <p>CODESHIELD Engine v3.5 · Powered by Advanced AST Neural De-Sloping &bull; Undetectable Academic & Professional Code Sanitizer</p>
     </footer>
 
-  </div>
-
-  
-  <div id="radar-overlay" class="radar-modal-overlay">
-    <div class="radar-content">
-      <div class="radar-scanner">
-        <div class="radar-grid"></div>
-        <div class="radar-sweep"></div>
-      </div>
-      <h3 style="color: var(--accent-cyan); font-size: 1.3rem; margin-bottom: 8px;">NEURAL RADAR SCANNING</h3>
-      <p style="color: var(--text-secondary); font-size: 0.85rem;">Evaluating AST complexity, token entropy, and AI commentary tropes...</p>
-      <div id="telemetry-log" class="telemetry-log">Initializing scanner...</div>
-    </div>
-  </div>
-
-  
-  <div id="humanizer-modal" class="modal-overlay">
-    <div class="modal-window">
-      <div class="modal-header">
-        <h3><span>⚡</span> AI Code Humanizer — Turnitin & GPTZero Stealth Bypass</h3>
-        <button id="close-humanizer-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-
-      <div class="modal-body">
-        
-        <div class="student-safe-banner" style="background: linear-gradient(90deg, rgba(16, 185, 129, 0.18), rgba(139, 92, 246, 0.15)); border: 1.5px solid #10b981; border-radius: 8px; padding: 10px 16px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-          <div>
-            <strong style="color: #34d399;">🎓 100% Student Safe Assignment Guarantee:</strong>
-            <span style="color: #d1fae5; font-size: 0.85rem;">Strictly zero comments, natural human idioms, passed Turnitin, GPTZero, CopyLeaks & MOSS.</span>
-          </div>
-          <div style="background: #10b981; color: #022c22; font-weight: 900; font-size: 0.8rem; padding: 4px 10px; border-radius: 999px;">
-            PASSED &lt; 18% AI
-          </div>
-        </div>
-
-        
-        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <label style="font-size: 0.85rem; color: var(--accent-cyan); font-weight: 700;">STYLE PERSONA:</label>
-            <select id="humanize-mode-select" class="input-select">
-              <option value="student" selected>🎓 CS Student / Junior (Traditional Loops, Student Variables, Safe)</option>
-              <option value="senior">👨‍💻 Senior / Production (Early Returns, Guard Clauses, 0 Slop)</option>
-              <option value="organic">🧪 Organic De-Optimization (Realistic Scars &amp; Style Drift)</option>
-              <option value="clone_style">🧬 Clone My Style (Extract &amp; Match My Habits)</option>
-            </select>
-            <button id="btn-apply-humanize" class="btn-hud"><span>🔄</span> Re-Humanize</button>
-            <button id="btn-open-clone-style" class="btn-hud" type="button" style="font-size: 0.78rem; padding: 6px 12px; display: none;">
-              <span>🧬</span> Configure My Style
-            </button>
-            <button id="btn-view-master-prompt" class="btn-hud" type="button" style="font-size: 0.78rem; padding: 6px 12px;">
-              <span>📜</span> Master Prompt
-            </button>
-            <button id="btn-open-universal-matrix-modal" class="btn-hud" type="button" style="font-size: 0.78rem; padding: 6px 12px;">
-              <span>🌐</span> Universal Matrix
-            </button>
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <div id="zero-break-badge" style="background: rgba(16, 185, 129, 0.15); border: 1px solid #10b981; color: #10b981; font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 6px;">
-              <span>🛡️</span> Zero-Break AST: Valid
-            </div>
-            <div id="naturalness-meter-badge" style="background: rgba(56, 189, 248, 0.15); border: 1px solid #38bdf8; color: #38bdf8; font-weight: 800; font-size: 0.78rem; padding: 4px 10px; border-radius: 6px; display: flex; align-items: center; gap: 6px;">
-              <span>✨</span> Naturalness: <span id="naturalness-score-val">98.4%</span>
-            </div>
-            <div id="humanize-score-drop" style="color: var(--accent-green); font-weight: 700; font-size: 0.95rem;">
-              AI Score: 88% ➔ 18% (-70%)
-            </div>
-          </div>
-        </div>
-
-        
-        <div id="triple-audit-box" class="triple-audit-box" style="margin-top: 14px; margin-bottom: 14px;">
-          <div class="audit-box-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-cyan); text-transform: uppercase;">
-                🛡️ Triple-Check Self-Audit Verification Loop
-              </span>
-              <span style="font-size: 0.75rem; color: var(--text-secondary);">
-                (Recursive 3-Pass Refinement to Escape External AI Detectors)
-              </span>
-            </div>
-            <div id="audit-escape-badge" class="badge-escaped" style="font-size: 0.8rem; padding: 4px 10px; border-radius: 6px; background: rgba(0, 255, 102, 0.15); border: 1px solid var(--accent-green); color: var(--accent-green); font-weight: 700;">
-              <span>🛡️</span> ESCAPED AI DETECTORS
-            </div>
-          </div>
-          <div id="audit-steps-grid" class="audit-steps-grid">
-            
-          </div>
-        </div>
-
-        
-        <div class="diff-container">
-          <div class="diff-pane">
-            <div class="diff-pane-header">
-              <span style="color: var(--accent-magenta);">ORIGINAL AI-GENERATED CODE</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Red = Detected AI Tropes</span>
-            </div>
-            <div id="diff-original-box" class="diff-code-box"></div>
-          </div>
-
-          <div class="diff-pane">
-            <div class="diff-pane-header">
-              <span style="color: var(--accent-green);">HUMANIZED IDIOMATIC CODE</span>
-              <span style="font-size: 0.75rem; color: var(--text-muted);">Green = Humanized Additions</span>
-            </div>
-            <div id="diff-humanized-box" class="diff-code-box"></div>
-          </div>
-        </div>
-
-        
-        <div>
-          <div style="font-size: 0.82rem; font-weight: 700; color: var(--text-secondary); text-transform: uppercase;">
-            Automated Naturalizations Applied:
-          </div>
-          <div id="changes-tag-list" class="changes-tag-list">
-            
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button id="btn-variation-humanized" class="btn-hud" title="Generate a fresh variation with different variables and syntax for duplicate submissions">
-          <span>🎲</span> Generate Next Variation
-        </button>
-        <button id="btn-rescan-humanized" class="btn-hud">
-          <span>🔄</span> Re-scan in Detector
-        </button>
-        <button id="btn-copy-humanized" class="btn-hud">
-          <span>📋</span> Copy Code
-        </button>
-        <button id="btn-download-humanized" class="btn-hud btn-hud-primary">
-          <span>💾</span> Download Clean File
-        </button>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="customizer-backdrop" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.5); z-index: 2999; display: none;"></div>
-  <aside id="customizer-drawer" class="customizer-drawer">
-    <div class="drawer-header">
-      <h3 style="font-size: 1.15rem; color: var(--accent-cyan);">🎨 Visual Customizer</h3>
-      <button id="btn-close-customizer" class="btn-hud btn-icon-only">✕</button>
-    </div>
-
-    <div class="drawer-body">
-      
-      <div class="control-group">
-        <label class="control-label">Color Themes (6 Styles)</label>
-        <div class="theme-options-grid">
-          <div class="theme-card-opt active" data-theme="cyberpunk">
-            <span class="theme-color-preview" style="background: linear-gradient(135deg, #00f0ff, #ff007f);"></span>
-            <span>Cyberpunk</span>
-          </div>
-          <div class="theme-card-opt" data-theme="matrix">
-            <span class="theme-color-preview" style="background: #00ff66;"></span>
-            <span>Matrix Core</span>
-          </div>
-          <div class="theme-card-opt" data-theme="abyssal">
-            <span class="theme-color-preview" style="background: linear-gradient(135deg, #38bdf8, #818cf8);"></span>
-            <span>Abyssal Space</span>
-          </div>
-          <div class="theme-card-opt" data-theme="synthwave">
-            <span class="theme-color-preview" style="background: linear-gradient(135deg, #ff71ce, #01cdfe);"></span>
-            <span>Synthwave</span>
-          </div>
-          <div class="theme-card-opt" data-theme="crimson">
-            <span class="theme-color-preview" style="background: #ff2e63;"></span>
-            <span>Crimson</span>
-          </div>
-          <div class="theme-card-opt" data-theme="minimal">
-            <span class="theme-color-preview" style="background: #94a3b8;"></span>
-            <span>Minimal Slate</span>
-          </div>
-        </div>
-      </div>
-
-      
-      <div class="control-group">
-        <label class="control-label">Background VFX Style</label>
-        <select id="vfx-mode-select" class="input-select" style="width: 100%;">
-          <option value="ambient_aurora" selected>🌌 Velvet Ambient Aurora (Luxury Glow)</option>
-          <option value="neural">🧠 Neural Constellation (Interactive Nodes)</option>
-          <option value="stardust">✨ Deep Space Stardust (Minimalist Particles)</option>
-          <option value="matrix_rain">💻 Digital Matrix Rain (Phosphor Stream)</option>
-        </select>
-      </div>
-
-      
-      <div class="control-group">
-        <label class="control-label">Particle Density</label>
-        <select id="vfx-density-select" class="input-select" style="width: 100%;">
-          <option value="off">Off (Zero Canvas)</option>
-          <option value="low">Low (Battery Saver)</option>
-          <option value="medium">Medium</option>
-          <option value="high" selected>High (Recommended)</option>
-          <option value="ultra">Ultra (Max Cyberpunk)</option>
-        </select>
-      </div>
-
-      
-      <div class="control-group">
-        <label class="control-label">Code Typography</label>
-        <select id="font-select" class="input-select" style="width: 100%;">
-          <option value="JetBrains Mono" selected>JetBrains Mono</option>
-          <option value="Fira Code">Fira Code</option>
-          <option value="Orbitron">Orbitron (Cyber)</option>
-          <option value="Inter">Inter (Clean Modern)</option>
-        </select>
-      </div>
-
-      
-      <div class="control-group">
-        <label class="control-label">
-          <span>Neon Glow Intensity</span>
-          <span id="glow-val-label">85%</span>
-        </label>
-        <input type="range" id="glow-slider" class="range-slider" min="0" max="100" value="85">
-      </div>
-
-      
-      <div class="toggle-row">
-        <span style="font-size: 0.9rem; font-weight: 600;">Holographic Scanlines</span>
-        <input type="checkbox" id="scanlines-toggle" checked style="accent-color: var(--accent-cyan); width: 18px; height: 18px; cursor: pointer;">
-      </div>
-
-      
-      <div class="toggle-row" style="display: none;">
-        <span style="font-size: 0.9rem; font-weight: 600;">Sci-Fi Synthesizer Audio</span>
-        <input type="checkbox" id="sound-toggle" style="accent-color: var(--accent-cyan); width: 18px; height: 18px; cursor: pointer;">
-      </div>
-    </div>
-  </aside>
-
-  
-  <div id="history-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 900px;">
-      <div class="modal-header">
-        <h3><span>📜</span> Persistent Scan History Database</h3>
-        <button id="close-history-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body">
-        <div style="overflow-x: auto;">
-          <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem;">
-            <thead>
-              <tr style="border-bottom: 1px solid var(--border-color); color: var(--accent-cyan);">
-                <th style="padding: 10px;">ID</th>
-                <th style="padding: 10px;">Project / Snippet</th>
-                <th style="padding: 10px;">Type</th>
-                <th style="padding: 10px;">AI Score</th>
-                <th style="padding: 10px;">Date</th>
-                <th style="padding: 10px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="history-table-body">
-              
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-
-
-  
-  <div id="chat-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 680px;">
-      <div class="modal-header">
-        <h3><span>🤖</span> CodeShield AI Intake Assistant</h3>
-        <button id="close-chat-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="chat-window-box">
-          <div class="chat-quick-pills">
-            <span style="font-size: 0.75rem; color: var(--text-secondary); margin-right: 4px; align-self: center;">I'm working on:</span>
-            <button class="quick-pill-btn" data-type="College Assignment">🎓 College Assignment (EVS / CS)</button>
-            <button class="quick-pill-btn" data-type="Hackathon">🏆 Hackathon / Contest</button>
-            <button class="quick-pill-btn" data-type="Job Interview">💼 Job Interview Assessment</button>
-            <button class="quick-pill-btn" data-type="Production App">🚀 Production Project</button>
-          </div>
-
-          <div id="chat-messages-box" class="chat-messages-container">
-            <div class="chat-msg bot">
-👋 **Welcome to CodeShield AI!**
-
-What are you participating in today? (e.g. College / University Assignment [EVS / CS], Hackathon, Technical Interview, or Work Project?)
-
-Tell me below or tap one of the buttons above so I can configure the best AI anti-detection rules and sensitivity for your specific needs!
-            </div>
-          </div>
-
-          <form id="chat-form" class="chat-input-bar">
-            <input type="text" id="chat-input" class="input-select" placeholder="e.g. I am participating in college EVS project..." style="flex: 1;" required>
-            <button type="submit" class="btn-hud btn-hud-primary">Send</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="auth-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 480px;">
-      <div class="modal-header">
-        <h3><span>👤</span> CodeShield Account</h3>
-        <button id="close-auth-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body">
-        
-        <div style="display: flex; gap: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; margin-bottom: 16px;">
-          <button id="tab-auth-login" class="tab-btn active" style="flex: 1; justify-content: center;">Sign In</button>
-          <button id="tab-auth-register" class="tab-btn" style="flex: 1; justify-content: center;">Create Account</button>
-        </div>
-
-        
-        <form id="form-auth-login">
-          <div class="control-group">
-            <label class="control-label">Email Address</label>
-            <input type="email" id="login-email" class="input-select" placeholder="user@example.com" required style="width: 100%;">
-          </div>
-          <div class="control-group" style="margin-top: 12px;">
-            <label class="control-label">Password</label>
-            <input type="password" id="login-password" class="input-select" placeholder="••••••••" required style="width: 100%;">
-          </div>
-          <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 10px;">
-            <button type="submit" class="btn-hud btn-hud-primary" style="width: 100%; justify-content: center;">
-              ⚡ Sign In
-            </button>
-            <button type="button" id="btn-fill-demo-auth" class="btn-hud" style="width: 100%; justify-content: center; font-size: 0.8rem;">
-              🔑 Fill Demo Account (demo@codeshield.ai)
-            </button>
-          </div>
-        </form>
-
-        
-        <form id="form-auth-register" style="display: none;">
-          <div class="control-group">
-            <label class="control-label">Username</label>
-            <input type="text" id="register-username" class="input-select" placeholder="CyberDev" required style="width: 100%;">
-          </div>
-          <div class="control-group" style="margin-top: 12px;">
-            <label class="control-label">Email Address</label>
-            <input type="email" id="register-email" class="input-select" placeholder="dev@example.com" required style="width: 100%;">
-          </div>
-          <div class="control-group" style="margin-top: 12px;">
-            <label class="control-label">Password</label>
-            <input type="password" id="register-password" class="input-select" placeholder="Min 6 characters" required style="width: 100%;">
-          </div>
-          <div class="control-group" style="margin-top: 12px;">
-            <label class="control-label">Participation Focus</label>
-            <select id="register-participation" class="input-select" style="width: 100%;">
-              <option value="College Assignment">College / University Assignment (EVS, CS)</option>
-              <option value="Hackathon">Hackathon / Coding Contest</option>
-              <option value="Job Interview">Job Interview Assessment</option>
-              <option value="Production Project">Production Application</option>
-            </select>
-          </div>
-          <button type="submit" class="btn-hud btn-hud-primary" style="width: 100%; justify-content: center; margin-top: 18px;">
-            🚀 Create Free Account (5 Free Scans)
-          </button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="payment-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 820px;">
-      <div class="modal-header">
-        <h3><span>👑</span> CodeShield Pro — Unlimited Access</h3>
-        <button id="close-payment-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="payment-card-grid">
-          
-          <div class="pro-plan-highlight">
-            <span class="badge-pro">PRO ACCESS</span>
-            <div class="price-tag">
-              ₹1,000 <span>/ month</span>
-            </div>
-            <p style="font-size: 0.88rem; color: var(--text-secondary);">
-              All 5 free scans used! Upgrade to CodeShield PRO to scan and humanize unlimited codebases.
-            </p>
-
-            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-              <div class="pro-feature-item"><span>✓</span> Unlimited Snippet & Folder Scans</div>
-              <div class="pro-feature-item"><span>✓</span> Stealth Zero-Comment Humanizer</div>
-              <div class="pro-feature-item"><span>✓</span> Bypass GPTZero, Turnitin, & CopyLeaks</div>
-              <div class="pro-feature-item"><span>✓</span> Download Clean ZIP Project Codebases</div>
-              <div class="pro-feature-item"><span>✓</span> Priority Neural Radar AST Engine</div>
-            </div>
-          </div>
-
-          
-          <div class="payment-methods-box">
-            <div class="payment-tabs">
-              <button type="button" class="pay-tab-btn active" data-pay="upi">📱 UPI / QR</button>
-              <button type="button" class="pay-tab-btn" data-pay="card">💳 Card</button>
-              <button type="button" class="pay-tab-btn" data-pay="netbanking">🏦 NetBanking</button>
-            </div>
-
-            
-            <div id="pay-view-upi">
-              <label class="control-label" style="margin-bottom: 8px;">Pay via UPI (GPay, PhonePe, Paytm)</label>
-              <input type="text" class="input-select" placeholder="username@okhdfcbank" value="student@upi" style="width: 100%; margin-bottom: 12px;">
-              <div style="text-align: center; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 8px;">
-                <div style="font-size: 32px; margin-bottom: 6px;">📲</div>
-                <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 700;">Instant UPI QR Code Enabled</div>
-                <div style="font-size: 0.75rem; color: var(--text-secondary);">Scan with any UPI app to pay ₹1,000</div>
-              </div>
-            </div>
-
-            
-            <div id="pay-view-card" style="display: none;">
-              <label class="control-label">Card Number</label>
-              <input type="text" class="input-select" placeholder="4111 2222 3333 4444" style="width: 100%; margin-bottom: 8px;">
-              <div style="display: flex; gap: 8px;">
-                <input type="text" class="input-select" placeholder="MM/YY" style="width: 50%;">
-                <input type="text" class="input-select" placeholder="CVV" style="width: 50%;">
-              </div>
-            </div>
-
-            
-            <div id="pay-view-netbanking" style="display: none;">
-              <label class="control-label" style="margin-bottom: 8px;">Select Bank</label>
-              <select class="input-select" style="width: 100%; margin-bottom: 12px;">
-                <option>HDFC Bank</option>
-                <option>State Bank of India (SBI)</option>
-                <option>ICICI Bank</option>
-                <option>Axis Bank</option>
-                <option>Kotak Mahindra Bank</option>
-              </select>
-            </div>
-
-            <button type="button" id="btn-submit-payment" class="btn-hud btn-hud-primary" style="width: 100%; justify-content: center; padding: 14px; margin-top: 10px; font-size: 1rem;">
-              ⚡ Pay ₹1,000 &amp; Activate PRO
-            </button>
-            <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted);">
-              🔒 256-Bit SSL Encrypted Razorpay/UPI Checkout
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="clone-style-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 820px; max-height: 85vh; display: flex; flex-direction: column;">
-      <div class="modal-header">
-        <h3><span>🧬</span> Clone My Style — Personal Developer Fingerprint</h3>
-        <button id="close-clone-style-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body" style="overflow-y: auto;">
-        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.5;">
-          Paste 1 to 3 code snippets that you personally wrote. CodeCraft will extract your variable casing, quote preferences, indentation spacing, and comment habits so all humanized code matches your authentic personal developer style.
-        </p>
-
-        <div style="margin-bottom: 12px;">
-          <label style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 700;">YOUR REFERENCE CODE SAMPLES:</label>
-          <textarea id="clone-style-samples-input" class="code-editor-textarea" style="width: 100%; height: 160px; margin-top: 6px; font-family: var(--font-main); font-size: 0.82rem;" placeholder="// Paste 1-3 snippets of your previously written code here...
-function fetchProfile(userId) {
-  const profile = db.query(userId);
-  return profile;
-}"></textarea>
-        </div>
-
-        <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
-          <button type="button" id="btn-extract-style-profile" class="btn-hud btn-hud-primary">
-            <span>🔍</span> Extract My Coding Style
-          </button>
-          <button type="button" id="btn-load-demo-style" class="btn-hud">
-            <span>✨</span> Load Sample Developer Profile
-          </button>
-        </div>
-
-        <div id="extracted-style-box" style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; display: none;">
-          <h4 style="font-size: 0.9rem; color: var(--accent-green); margin-bottom: 10px; display: flex; align-items: center; gap: 6px;">
-            <span>✅</span> Extracted Personal Developer Profile
-          </h4>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; font-size: 0.82rem;">
-            <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-              <span style="color: var(--text-secondary);">Variable Casing:</span>
-              <strong id="style-casing-val" style="color: #38bdf8; display: block; margin-top: 2px;">snake_case</strong>
-            </div>
-            <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-              <span style="color: var(--text-secondary);">Indentation:</span>
-              <strong id="style-indent-val" style="color: #38bdf8; display: block; margin-top: 2px;">4 spaces</strong>
-            </div>
-            <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-              <span style="color: var(--text-secondary);">Quote Style:</span>
-              <strong id="style-quotes-val" style="color: #38bdf8; display: block; margin-top: 2px;">single quotes (')</strong>
-            </div>
-            <div style="background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
-              <span style="color: var(--text-secondary);">Comment Density:</span>
-              <strong id="style-comments-val" style="color: #38bdf8; display: block; margin-top: 2px;">none (clean)</strong>
-            </div>
-          </div>
-          <div id="style-summary-text" style="font-size: 0.8rem; color: #a5f3fc; margin-top: 10px; font-style: italic;"></div>
-        </div>
-      </div>
-      <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 10px;">
-        <button id="btn-apply-cloned-style" class="btn-hud btn-hud-primary" disabled>
-          <span>🎯</span> Apply &amp; Humanize With My Style
-        </button>
-        <button id="btn-close-clone-style" class="btn-hud">Close</button>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="universal-matrix-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 920px; max-height: 85vh; display: flex; flex-direction: column;">
-      <div class="modal-header">
-        <h3><span>🌐</span> Universal AI Code Signatures &amp; Normalization Matrix</h3>
-        <button id="close-universal-matrix-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body" style="overflow-y: auto;">
-        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
-          Each major AI model family (OpenAI, Anthropic Claude, Google Gemini, DeepSeek, and Meta Llama / Copilot) leaves distinct behavioral footprints. CodeCraft's Universal Normalizer Matrix targets and neutralizes all of them simultaneously:
-        </p>
-        <div id="universal-matrix-modal-grid" class="universal-matrix-modal-grid" style="display: flex; flex-direction: column; gap: 10px;">
-          
-        </div>
-      </div>
-      <div class="modal-footer" style="display: flex; justify-content: flex-end;">
-        <button id="btn-close-universal-matrix" class="btn-hud">Close</button>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="master-prompt-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 820px; max-height: 85vh; display: flex; flex-direction: column;">
-      <div class="modal-header">
-        <h3><span>📜</span> Master System Prompt for Senior Engineer Code Humanizer</h3>
-        <button id="close-master-prompt-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body" style="overflow-y: auto;">
-        <p style="font-size: 0.88rem; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.5;">
-          This master system prompt guides CodeShield's two-stage humanization pipeline to refactor code to senior developer idioms, prune pedagogical comments, and dismantle AI footprints:
-        </p>
-        <div style="position: relative;">
-          <pre id="master-prompt-text" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; font-family: var(--font-main); font-size: 0.82rem; color: #a5f3fc; white-space: pre-wrap; line-height: 1.55; max-height: 380px; overflow-y: auto; user-select: all;"></pre>
-        </div>
-      </div>
-      <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
-        <span id="prompt-copy-status" style="font-size: 0.82rem; color: var(--accent-green); font-weight: 600;"></span>
-        <div style="display: flex; gap: 10px;">
-          <button id="btn-copy-master-prompt" class="btn-hud btn-hud-primary">
-            <span>📋</span> Copy System Prompt
-          </button>
-          <button id="btn-close-master-prompt" class="btn-hud">Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  
-  <div id="factor-explainer-modal" class="modal-overlay">
-    <div class="modal-window" style="max-width: 900px; max-height: 88vh; display: flex; flex-direction: column;">
-      <div class="modal-header">
-        <h3><span>📘</span> How AI Code Detectors Work &amp; How CodeShield Escapes Them</h3>
-        <button id="close-factor-explainer-btn" class="btn-hud btn-icon-only">✕</button>
-      </div>
-      <div class="modal-body" style="overflow-y: auto; padding-right: 12px;">
-        <p style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.6; margin-bottom: 16px;">
-          When checking any content—whether it's code, an essay, an email, or an article—evaluation relies on <strong>stylometry and statistical pattern analysis</strong>. Rather than a magic formula, detection algorithms (Turnitin, GPTZero, CopyLeaks, MOSS) look for <strong>distinct behavioral footprints left by language models</strong>.
-        </p>
-
-        
-        <h4 style="color: var(--accent-cyan); font-size: 1.05rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
-          <span>🧬</span> The 9 Core Detection Signals (AI vs. Human)
-        </h4>
-
-        <div style="display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 24px;">
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">1. Comments:</strong> AI over-explains obvious things (<code># increment counter by 1</code>), uniform docstrings everywhere; Humans are sparse, informal, leave <code>// TODO</code>, <code>// FIXME</code>, <code>// hack</code>, and commented-out dead code.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">2. Naming Conventions:</strong> AI uses consistent textbook names (<code>user_data</code>, <code>calculate_total</code>, <code>is_valid</code>); Humans use mixed conventions (<code>usr</code>, <code>tmp</code>, <code>x2</code>, <code>data2</code>, <code>acc</code>, <code>el</code>), personal shorthand.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">3. Error Handling:</strong> AI writes exhaustive <code>try/except</code> covering every edge case with generic messages; Humans write partial error handling or bare <code>except: pass</code> for cases hit during debugging.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">4. Structure &amp; Formatting:</strong> AI has sterile indentation and identical blank-line rhythm between blocks; Humans have spacing drift, tighter grouping, and line-length variance.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">5. Code Organization:</strong> AI is hyper-modular with micro-functions even for 2 lines; Humans write contextual inline logic and idiomatic comprehensions.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">6. Boilerplate &amp; Imports:</strong> AI includes sterile sorted imports and <code>if __name__ == '__main__':</code> with tidy mock data; Humans add imports as needed and submit clean isolated assignment functions.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">7. Variable Lifecycle:</strong> AI maintains single-purpose procedural accumulators (<code>total=0, count=0, list=[]</code>); Humans reuse variables lazily and aggregate directly with <code>sum()</code>.
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">8. Absence of Development Scars:</strong> AI code looks like a single-pass first draft; Human code almost always has traces of trial-and-error (TODO notes, leftover debug statements).
-          </div>
-          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 12px;">
-            <strong style="color: #38bdf8;">9. Statistical &amp; Stylometric Cues:</strong> AI has low token perplexity (path of least resistance), clustered line length std dev, and uniform whitespace entropy; Humans exhibit wild burstiness.
-          </div>
-        </div>
-
-        
-        <h4 style="color: var(--accent-magenta); font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-          <span>📜</span> The Master System Prompt for Senior Engineer Humanization
-        </h4>
-        <div style="background: rgba(0,0,0,0.4); border: 1px solid var(--border-color); border-radius: 8px; padding: 14px; margin-bottom: 24px;">
-          <p style="font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 8px;">
-            You can use this exact system prompt in any LLM or CodeShield pipeline:
-          </p>
-          <pre style="font-family: var(--font-main); font-size: 0.78rem; color: #a5f3fc; white-space: pre-wrap; line-height: 1.5; max-height: 240px; overflow-y: auto;">You are a senior software engineer refactoring code to match realistic, idiomatic, and human-written developer habits. 
-Your task is to rewrite the input code while preserving 100% of its exact logic, behavior, performance, and API signatures.
-Apply the following transformation rules strictly:
-1. COMMENT AUDIT (Zero Pedagogical Comments):
-   - Delete all comments that explain *what* standard syntax does.
-   - Remove boilerplate docstrings on trivial or internal helper functions.
-   - Keep comments sparse (maximum 1-2 per 50 lines) explaining *why* domain logic exists.
-2. PRAGMATIC IDENTIFIER NAMING:
-   - Replace verbose, dictionary-perfect names with standard developer idioms (e.g., sanitizedUserList -> users, currentIterationIndex -> idx, temporaryBufferData -> buf).
-   - Use common abbreviations (req, res, ctx, err, cfg, payload).
-3. PRUNE DEFENSIVE BOILERPLATE:
-   - Remove redundant try-catch blocks that merely log and rethrow.
-   - Use early returns / guard clauses rather than deep if-else nesting.
-4. INCREASE BURSTINESS & SYNTACTIC VARIATION:
-   - Alternate between concise language features (comprehensions, ternary) and loops.
-5. OUTPUT CONSTRAINTS:
-   - Return ONLY refactored code inside a single code block without conversational preamble.</pre>
-        </div>
-
-        
-        <h4 style="color: #34d399; font-size: 1.05rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-          <span>⚙️</span> Recommended 2-Stage Pipeline Architecture
-        </h4>
-        <div class="pipeline-diagram-box">
-[ AI Code Input ]
-        │
-        ▼
-[ Step 1: Senior Engineer Refactoring with High Diversity ]
-   - Applies the Master System Prompt rules
-   - Restructures logic, variable names, and collapses procedural accumulators
-        │
-        ▼
-[ Step 2: Deterministic Post-Processing (AST / Formatter) ]
-   - Regex: Strips residual conversational markers (// Note:, # Step 1:)
-   - Formatter: Validates indentation &amp; quote consistency
-   - AST Compiler: Guarantees 100% syntactically valid &amp; runnable code
-        │
-        ▼
-[ Humanized Code Output (< 18% AI Probability • Passed Turnitin &amp; MOSS) ]
-        </div>
-
-        
-        <h4 style="color: #f59e0b; font-size: 1rem; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
-          <span>⚠️</span> What NOT to Do (Common Pitfalls)
-        </h4>
-        <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.84rem; color: var(--text-secondary); line-height: 1.55; margin-bottom: 16px;">
-          <div>❌ <strong>Do NOT introduce typos or syntax errors:</strong> Real code must compile and pass tests. Syntax errors make code look broken, not human.</div>
-          <div>❌ <strong>Do NOT use bad indentation:</strong> Modern developers use format-on-save (Prettier, Black). Messy whitespace triggers automated obfuscation detectors.</div>
-          <div>❌ <strong>Do NOT use trigger words like "bypass detector":</strong> Frame requests around "senior engineer refactoring", "idiomatic standards", and "pruning pedagogical boilerplate".</div>
-        </div>
-
-      </div>
-      <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
-        <button id="btn-close-factor-explainer" class="btn-hud btn-hud-primary" style="padding: 10px 24px;">Got It</button>
-      </div>
-    </div>
-  </div>
-
-  
-  <script src="js/vfx.js"></script>
-  <script src="js/app.js"></script>
+    <!-- Isolated App Controller JS -->
+    <script src="js/app_humanizer.js"></script>
 </body>
 </html>

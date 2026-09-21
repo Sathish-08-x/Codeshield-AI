@@ -123,6 +123,14 @@ UNIVERSAL_LEXICAL_CORRUPTIONS = [
     (r"\bbase64_image_data\b", "b64"),
     (r"\bbase64Image\b", "b64"),
     (r"\bbase64_image\b", "b64"),
+    (r"\buserPromptText\b", "userInput"),
+    (r"\buser_prompt_text\b", "user_input"),
+    (r"\boutputTerminalBox\b", "terminal"),
+    (r"\boutput_terminal_box\b", "terminal"),
+    (r"\bpromptInputArea\b", "txtInput"),
+    (r"\bprompt_input_area\b", "txt_input"),
+    (r"\bdispatchButton\b", "btn"),
+    (r"\bdispatch_button\b", "btn"),
 ]
 
 VAR_VARIATION_SETS = [
@@ -713,6 +721,12 @@ def deconstruct_ai_idioms(code: str, academic_year: str = "year_1", persona: str
             res = re.sub(c_pat, c_repl, res)
             changes.append("Switched modern `const` to traditional `var` out of old-school developer muscle memory [Rule 4]")
 
+    # 12. Add a subtle, natural human touch comment if none exists
+    if mode != "zero_comment" and not any("//" in l or "#" in l for l in res.splitlines()) and len(res) > 50:
+        comment_prefix = "//" if language in ("javascript", "typescript", "js", "ts", "java", "cpp", "c", "csharp") else "#"
+        res = f"{comment_prefix} quick fix for submission\n" + res
+        changes.append("Injected natural human developer note `quick fix for submission`")
+
     return res, changes
 
 def apply_burstiness_formatting(code: str, language: str = "python") -> str:
@@ -753,6 +767,7 @@ def clean_ai_artifacts(code: str, language: str = "python") -> str:
     cleaned = re.sub(r'(?m)^\s*(?:#|//)\s*(?:Step\s*)?\d+[\.:\)]\s*.*$', '', cleaned)
     cleaned = re.sub(r'(?m)^\s*(?:#|//)\s*(?:Uses|Utilizes|Implements)\s+.*?(?:technique|algorithm|O\(n\)|two-pointer|sliding\s+window).*$', '', cleaned)
     cleaned = re.sub(r'(?m)^\s*#\s*.*?(?:automatically follows redirects|decodes gzip|built-in method|under the hood|automatically handles).*$', '', cleaned)
+    cleaned = re.sub(r'(?i)(#|//)\s*(?:Event listener|Initialize|Function to|A utility|Handling the).*?\n', '', cleaned)
 
     # Rule 3: Erased Tutorial-Style Documentation Comments (Section headers)
     cleaned = re.sub(r'(?i)(?://|#|\/\*)\s*(?:UI|Pipeline|Execution|Configuration|Setup|Component|Main|Core)\s+Logic\s*:?.*?(?:\*\/|\n|$)', '\n', cleaned)

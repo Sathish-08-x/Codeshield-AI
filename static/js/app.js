@@ -3258,6 +3258,7 @@ const calculateDiscount = (orderTotal, discountRate) => {
     // Rule 3: Erased Tutorial-Style Documentation Comments
     cleaned = cleaned.replace(/(?:\/\/|#|\/\*)\s*(?:UI|Pipeline|Execution|Configuration|Setup|Component|Main|Core)\s+Logic\s*:?.*?(?:\*\/|\n|$)/gi, '\n');
     cleaned = cleaned.replace(/(?:\/\/|#)\s*={3,}\s*(?:UI|Pipeline|Execution|Logic|Config).*/gi, '');
+    cleaned = cleaned.replace(/(?:\/\/|#)\s*(?:Event listener|Initialize|Function to|A utility|Handling the).*?\n/gi, '');
     changes.push("Stage 1: Stripped 100% of AI comments and docstring boilerplate");
 
     // Strip single-line comments
@@ -3357,12 +3358,24 @@ const calculateDiscount = (orderTotal, discountRate) => {
       [/\bbase64ImageData\b/g, "b64"],
       [/\bbase64_image_data\b/g, "b64"],
       [/\bbase64Image\b/g, "b64"],
-      [/\bbase64_image\b/g, "b64"]
+      [/\bbase64_image\b/g, "b64"],
+      [/\buserPromptText\b/g, "userInput"],
+      [/\buser_prompt_text\b/g, "user_input"],
+      [/\boutputTerminalBox\b/g, "terminal"],
+      [/\boutput_terminal_box\b/g, "terminal"],
+      [/\bpromptInputArea\b/g, "txtInput"],
+      [/\bprompt_input_area\b/g, "txt_input"],
+      [/\bdispatchButton\b/g, "btn"],
+      [/\bdispatch_button\b/g, "btn"]
     ];
     for (let [pat, repl] of studentVars) {
       if (pat.test(cleaned)) {
         cleaned = cleaned.replace(pat, repl);
       }
+    }
+
+    if (!cleaned.includes('//') && !cleaned.includes('#') && cleaned.length > 50) {
+      cleaned = "// quick fix for submission\n" + cleaned;
     }
 
     const origScore = 96.5;

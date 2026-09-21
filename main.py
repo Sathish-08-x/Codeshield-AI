@@ -385,9 +385,16 @@ async def humanize_endpoint(req: HumanizeRequest):
     if not req.code or not req.code.strip():
         raise HTTPException(status_code=400, detail="No code provided to humanize")
 
+    lang = req.language
+    if not lang or lang == "python":
+        from engine.detector import detect_language
+        detected = detect_language("snippet", req.code)
+        if detected and detected != "plaintext":
+            lang = detected
+
     result = humanize_code(
         req.code, 
-        language=req.language or "python", 
+        language=lang or "python", 
         mode=req.mode or "pragmatic",
         target_scope=req.target_scope or "whole",
         flagged_line_numbers=req.flagged_line_numbers,
@@ -401,6 +408,7 @@ async def humanize_endpoint(req: HumanizeRequest):
     if req.file_id:
         update_file_humanized_code(req.file_id, result["humanized_code"])
 
+    result["humanized"] = result["humanized_code"]
     return result
 
 @app.get("/api/humanizer/master-prompt")
