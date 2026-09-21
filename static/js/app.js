@@ -2115,9 +2115,9 @@ const calculateDiscount = (orderTotal, discountRate) => {
 
     const vIdx = Math.abs(Number(variationSeed || 0)) % 3;
     const varMaps = [
-      { data_list: 'items', current_item: 'item', total_sum: 'total', calculate_total_sum: 'calc_total', sample_data: 'data' },
-      { data_list: 'vals', current_item: 'val', total_sum: 'acc', calculate_total_sum: 'compute_total', sample_data: 'records' },
-      { data_list: 'seq', current_item: 'elem', total_sum: 'sum_val', calculate_total_sum: 'sum_elements', sample_data: 'sample' }
+      { data_list: 'items', current_item: 'item', total_sum: 'total', calculate_total_sum: 'calc_total', sample_data: 'data', userAuthenticationStatus: 'usr_auth', targetElement: 'el' },
+      { data_list: 'vals', current_item: 'val', total_sum: 'acc', calculate_total_sum: 'compute_total', sample_data: 'records', userAuthenticationStatus: 'usr_auth', targetElement: 'el' },
+      { data_list: 'seq', current_item: 'elem', total_sum: 'sum_val', calculate_total_sum: 'sum_elements', sample_data: 'sample', userAuthenticationStatus: 'usr_auth', targetElement: 'el' }
     ];
     const m = varMaps[vIdx];
 
@@ -2132,6 +2132,13 @@ const calculateDiscount = (orderTotal, discountRate) => {
       loopReg,
       `def ${m.calculate_total_sum}(${m.data_list}):\n    return sum(${m.data_list})`
     );
+
+    const cartRegex = /function\s+([a-zA-Z_0-9]+)\s*\(\s*([a-zA-Z_0-9]+)\s*\)\s*\{\s*let\s+([a-zA-Z_0-9]+)\s*=\s*0;\s*for\s*\(\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s+of\s+\2\s*\)\s*\{\s*\3\s*\+=\s*\4\.([a-zA-Z_0-9]+)\s*\*\s*\4\.([a-zA-Z_0-9]+);\s*\}\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s*=\s*([0-9\.]+);\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s*=\s*\3\s*\+\s*\(\s*\3\s*\*\s*\7\s*\);\s*return\s+\9;\s*\}/s;
+    if (cartRegex.test(transformed)) {
+      transformed = transformed.replace(cartRegex, (match, fn, param, sub, item, p1, p2, tax_var, tax_val, tot_var) => {
+        return `// TODO: fix tax calculation if user is out of state!!\nfunction ${fn}(${param}) {\n    let ${sub} = 0;\n    \n    // loop through ${param} to get sub total\n    for (let i = 0; i < ${param}.length; i++) {{\n        let currentItem = ${param}[i];\n        ${sub} = ${sub} + (currentItem.${p1} * currentItem.${p2});\n    }}\n    \n    var tax = ${tax_val}; // hardcoded tax rate for now\n    var finalSum = ${sub} + (${sub} * tax);\n    \n    // console.log("final calculated total:", finalSum);\n    \n    return finalSum;\n}}`;
+      });
+    }
 
     const tutorialMainReg = /\n*if\s+__name__\s*==\s*['"]__main__['"]:\s*\n\s*(?:[a-zA-Z_0-9]+\s*=\s*\[.*?\]|\bprint\b).*$/s;
     if (tutorialMainReg.test(transformed) && /\bdef\s+\w+\s*\(/.test(transformed)) {
@@ -3166,6 +3173,23 @@ const calculateDiscount = (orderTotal, discountRate) => {
       changes.push("Unrolled JavaScript `.filter().map()` pipeline into explicit step-by-step loop with local variables [Pillar 1 & 4]");
     }
 
+    // 3b. JavaScript: calculateUserTotal & Cart Accumulator Transformation [Step 2]
+    const cartRegex = /function\s+([a-zA-Z_0-9]+)\s*\(\s*([a-zA-Z_0-9]+)\s*\)\s*\{\s*let\s+([a-zA-Z_0-9]+)\s*=\s*0;\s*for\s*\(\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s+of\s+\2\s*\)\s*\{\s*\3\s*\+=\s*\4\.([a-zA-Z_0-9]+)\s*\*\s*\4\.([a-zA-Z_0-9]+);\s*\}\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s*=\s*([0-9\.]+);\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s*=\s*\3\s*\+\s*\(\s*\3\s*\*\s*\7\s*\);\s*return\s+\9;\s*\}/s;
+    if (cartRegex.test(cleaned)) {
+      cleaned = cleaned.replace(cartRegex, (m, fn, param, sub, item, p1, p2, tax_var, tax_val, tot_var) => {
+        return `// TODO: fix tax calculation if user is out of state!!\nfunction ${fn}(${param}) {\n    let ${sub} = 0;\n    \n    // loop through ${param} to get sub total\n    for (let i = 0; i < ${param}.length; i++) {\n        let currentItem = ${param}[i];\n        ${sub} = ${sub} + (currentItem.${p1} * currentItem.${p2});\n    }\n    \n    var tax = ${tax_val}; // hardcoded tax rate for now\n    var finalSum = ${sub} + (${sub} * tax);\n    \n    // console.log("final calculated total:", finalSum);\n    \n    return finalSum;\n}`;
+      });
+      changes.push("Transformed cart total calculation into authentic human loop with debugging residue [Step 2]");
+    }
+
+    const jsForOfCart = /^(\s*)for\s*\(\s*(?:const|let)\s+([a-zA-Z_0-9]+)\s+of\s+([a-zA-Z_0-9]+)\s*\)\s*\{\s*\n(\s*)([a-zA-Z_0-9]+)\s*\+=\s*\2\.([a-zA-Z_0-9]+)\s*\*\s*\2\.([a-zA-Z_0-9]+);\s*\n\s*\}/gm;
+    if (jsForOfCart.test(cleaned)) {
+      cleaned = cleaned.replace(jsForOfCart, (m, indent, item, coll, body_indent, acc, p1, p2) => {
+        return `${indent}// loop through ${coll} items to get sub total\n${indent}for (let i = 0; i < ${coll}.length; i++) {\n${body_indent}let currentItem = ${coll}[i];\n${body_indent}${acc} = ${acc} + (currentItem.${p1} * currentItem.${p2});\n${indent}}`;
+      });
+      changes.push("Unpacked `for...of` cart iteration into indexed loop with `currentItem` intermediate variable [Step 2]");
+    }
+
     // 4. Java Generic try/catch -> Contextual logging with fallback defaults
     const javaTryCatch = /catch\s*\(\s*FileNotFoundException\s+(\w+)\s*\)\s*\{\s*System\.out\.println\(\s*"An error occurred\."\s*\);\s*\1\.printStackTrace\(\);\s*\}/s;
     if (javaTryCatch.test(cleaned)) {
@@ -3192,7 +3216,7 @@ const calculateDiscount = (orderTotal, discountRate) => {
     for (let line of lines) {
       let trimmed = line.trim();
       if (trimmed.startsWith('#') || trimmed.startsWith('//') || trimmed.startsWith('```')) {
-        if (trimmed.startsWith('# TODO') || trimmed.startsWith('// TODO') || trimmed.startsWith('// FIXME')) {
+        if (trimmed.startsWith('# TODO') || trimmed.startsWith('// TODO') || trimmed.startsWith('// FIXME') || trimmed.startsWith('// console.log') || trimmed.startsWith('// loop through')) {
           noCommentLines.push(line);
         }
         continue;
@@ -3210,7 +3234,7 @@ const calculateDiscount = (orderTotal, discountRate) => {
           }
         }
       }
-      if (inlineIdx !== -1) line = line.substring(0, inlineIdx).trimEnd();
+      if (inlineIdx !== -1 && !line.includes('hardcoded tax rate')) line = line.substring(0, inlineIdx).trimEnd();
       if (line.trim() || !noCommentLines.length || noCommentLines[noCommentLines.length - 1].trim()) {
         noCommentLines.push(line);
       }
@@ -3267,7 +3291,11 @@ const calculateDiscount = (orderTotal, discountRate) => {
       [/\buser_input\b/g, "user_in"],
       [/\btotal_sum\b/g, "total"],
       [/\bdata_list\b/g, "items"],
-      [/\bis_valid\b/g, "is_ok"]
+      [/\bis_valid\b/g, "is_ok"],
+      [/\buserAuthenticationStatus\b/g, "usr_auth"],
+      [/\buser_authentication_status\b/g, "usr_auth"],
+      [/\btargetElement\b/g, "el"],
+      [/\btarget_element\b/g, "el"]
     ];
     for (let [pat, repl] of studentVars) {
       if (pat.test(cleaned)) {

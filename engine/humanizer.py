@@ -5,28 +5,22 @@ import random
 from typing import Dict, Any, List, Optional, Tuple
 from .detector import detect_ai_code, detect_language
 
-MASTER_SYSTEM_PROMPT = """You are a senior software engineer refactoring code to make it 100% human-written and defeat every AI code detector (including CodeSpy.ai, Blaxel, Turnitin, Copyleaks, SonarQube).
-AI detectors evaluate low perplexity (mathematical predictability) and low burstiness (uniform formatting). To beat them, you must inject HIGH PERPLEXITY and HIGH BURSTINESS across the 4 Core Pillars:
+MASTER_SYSTEM_PROMPT = """You are an advanced code humanization pipeline. Your only job is to take clean, machine-generated code and completely rewrite its structure, style, and entropy to mirror a real human developer working under a tight deadline.
 
-1. PILLAR 1: WIPE OUT THE 3 AI STRUCTURAL SIGNATURES
-   - Break Linear Progression: Mix content blocks, use non-standard layouts, asymmetric structures.
-   - Avoid 'Textbook' Nesting: Replace sterile nested utility divs with semantic HTML5 elements (<main>, <article>, <aside>) and custom classes/IDs.
-   - Decentralize Boilerplate: Separate monolithic scripts into modular, dynamic components.
+You MUST apply the following transformations heavily to the input code:
+1. Lexical Corruption: Replace textbook variable names (e.g., `userAuthenticationStatus`, `targetElement`) with lazy, tired, or practical developer abbreviations (`usr_auth`, `el`, `tmp`, `val`, `i`).
+2. Structural Messiness: Remove pristine modular perfection. Introduce slight code duplication, use awkward intermediate step-by-step variables instead of clean one-liners, or nest logic deeper than necessary.
+3. Comments & Artifacts: Delete all neat, tutorial-style explaining comments. Inject a frustrated or casual developer note (e.g., `// TODO: fix this bug later` or `// why does this break??`) or leave a commented-out debug line (`// console.log(data);`).
+4. Formatting Entropy: Do not use uniform, mathematical spacing. Introduce minor quirks in indentation spacing or uneven line lengths.
+5. Technical Inconsistency: Mix old syntax with new syntax (e.g., using `var` alongside modern blocks, or older string formatting methods) out of simulated muscle memory.
 
-2. PILLAR 2: RANDOMISE NAMING ARCHITECTURE
-   - Inconsistent Patterns: Mix naming conventions in the same file (camelCase, snake_case, shorthand like `currentBal`, `amt_spent`, `post_tx_funds`, `get_avg`, `running_total`).
-   - Custom Terminology: Completely ban textbook names like `.hero-content`, `.card-grid`, `.navbar`, `calculate_average_grade`, `process_user_transaction_data`. Use arbitrary, architectural names like `.introPitch`, `.boxGroup-3`, `.mastheadBlock`, `handle_tx`, `get_avg`.
+AI detectors evaluate low perplexity (mathematical predictability) and low burstiness (uniform formatting). To defeat every AI code detector (including CodeSpy.ai, Blaxel, Turnitin, Copyleaks, SonarQube), inject HIGH PERPLEXITY and HIGH BURSTINESS across the 4 Core Pillars:
+- PILLAR 1: WIPE OUT THE 3 AI STRUCTURAL SIGNATURES (Break linear progression, use semantic HTML5 elements <main>/<article> over utility classes, decentralize boilerplate).
+- PILLAR 2: RANDOMISE NAMING ARCHITECTURE (Inconsistent patterns: mix camelCase, snake_case, shorthand like `currentBal`, `amt_spent`, `post_tx_funds`, `get_avg`, `running_total`; ban textbook names like `.hero-content`, `.card-grid`, `.navbar`, `calculate_average_grade`, `process_user_transaction_data`).
+- PILLAR 3: CHANGE 100% OF THE WRITTEN COPY & NATURAL STRINGS (Target hyper-specific real-world niches, ban corporate tech speech, use authentic developer logging).
+- PILLAR 4: INJECT NATURAL DEVELOPER NOISE & HIGH BURSTINESS (Practical TODO/FIXME notes, vary whitespace geometry, deconstruct overly compact logic into step-by-step loops with intermediate variables).
 
-3. PILLAR 3: CHANGE 100% OF THE WRITTEN COPY & NATURAL STRINGS
-   - Target a Hyper-Specific Niche: Delete generic placeholder AI marketing text ('Transform Your Digital Presence', 'Discover the future today', 'Build your digital presence', 'seamless user experience'). Rewrite to fit a real-world business (e.g. 'Heavy duty steel. Built to last.', 'Custom Fab').
-   - Write Like a Real Developer: Ban corporate tech speech ('An error occurred', 'Successfully initialized'). Use casual, immediate log strings (`[System] loaded ok`, `[Data Setup] Configuration file missing, loading system defaults instead.`, `[Grade Log] No scores provided to average function.`).
-
-4. PILLAR 4: INJECT NATURAL DEVELOPER NOISE & HIGH BURSTINESS
-   - Write Human Comments: When notes are present, write practical shorthand TODO/FIXME notes (`<!-- TODO: integrate sticky behavior on window scroll later -->`, `// FIXME: clean up trailing spaces from input`, `# TODO: add type verification check later if input shifts to dicts`).
-   - Vary Whitespace Geometry: Collapse simple inline assignments tightly, but leave erratic double line breaks between larger conceptual blocks to disrupt mathematical layout uniformity.
-   - De-optimize Overly Elegant Code: Replace compact one-liners (list comprehensions, chained .filter().map(), sum()/len()) with step-by-step explicit loops (for, while) and in-between step variables.
-
-Follow the Comprehensive 200-Rule Human Code Camouflage Framework across all 10 phases while preserving 100% exact runtime logic and API contracts."""
+Return ONLY the raw, humanized code block. No explanations, no markdown text outside the code block."""
 
 UNIVERSAL_SYSTEM_PROMPT = """You are an agnostic code refactoring engine. Your goal is to convert synthetic AI-generated code into natural, idiomatic human-written code.
 Assume the input may come from OpenAI, Claude, Gemini, or DeepSeek. Apply the following normalization rules:
@@ -108,6 +102,13 @@ STUDENT_VARIATION_SETS = [
         (r"\brequest_object\b", "req"),
         (r"\bresponse_object\b", "resp"),
     ]
+]
+
+UNIVERSAL_LEXICAL_CORRUPTIONS = [
+    (r"\buserAuthenticationStatus\b", "usr_auth"),
+    (r"\buser_authentication_status\b", "usr_auth"),
+    (r"\btargetElement\b", "el"),
+    (r"\btarget_element\b", "el"),
 ]
 
 VAR_VARIATION_SETS = [
@@ -580,6 +581,24 @@ def deconstruct_ai_idioms(code: str, academic_year: str = "year_1", persona: str
         res = re.sub(js_filter_map_pattern, repl_js_filter_map, res)
         changes.append("Unrolled JavaScript `.filter().map()` pipeline into explicit step-by-step loop with local variables [Pillar 1 & 4]")
 
+    # 6b. JavaScript: calculateUserTotal & Cart Accumulator Transformation [Step 2]
+    cart_pattern = r"""(?s)function\s+([a-zA-Z_0-9]+)\s*\(\s*([a-zA-Z_0-9]+)\s*\)\s*\{\s*let\s+([a-zA-Z_0-9]+)\s*=\s*0;\s*for\s*\(\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s+of\s+\2\s*\)\s*\{\s*\3\s*\+=\s*\4\.([a-zA-Z_0-9]+)\s*\*\s*\4\.([a-zA-Z_0-9]+);\s*\}\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s*=\s*([0-9\.]+);\s*(?:const|let|var)\s+([a-zA-Z_0-9]+)\s*=\s*\3\s*\+\s*\(\s*\3\s*\*\s*\7\s*\);\s*return\s+\9;\s*\}"""
+    if re.search(cart_pattern, res):
+        def repl_cart(m):
+            fn, param, sub, item, p1, p2, tax_var, tax_val, tot_var = m.groups()
+            todo_line = "// TODO: fix tax calculation if user is out of state!!\n" if mode != "zero_comment" else ""
+            return f"""{todo_line}function {fn}({param}) {{\n    let {sub} = 0;\n    \n    // loop through {param} to get sub total\n    for (let i = 0; i < {param}.length; i++) {{\n        let currentItem = {param}[i];\n        {sub} = {sub} + (currentItem.{p1} * currentItem.{p2});\n    }}\n    \n    var tax = {tax_val}; // hardcoded tax rate for now\n    var finalSum = {sub} + ({sub} * tax);\n    \n    // console.log("final calculated total:", finalSum);\n    \n    return finalSum;\n}}"""
+        res = re.sub(cart_pattern, repl_cart, res)
+        changes.append("Transformed cart total calculation into authentic human loop with debugging residue [Step 2]")
+
+    js_for_of_cart = r"(?m)^(\s*)for\s*\(\s*(?:const|let)\s+([a-zA-Z_0-9]+)\s+of\s+([a-zA-Z_0-9]+)\s*\)\s*\{\s*\n(\s*)([a-zA-Z_0-9]+)\s*\+=\s*\2\.([a-zA-Z_0-9]+)\s*\*\s*\2\.([a-zA-Z_0-9]+);\s*\n\s*\}"
+    def repl_js_for_of_cart(m):
+        indent, item, coll, body_indent, acc, p1, p2 = m.groups()
+        return f"{indent}// loop through {coll} items to get sub total\n{indent}for (let i = 0; i < {coll}.length; i++) {{\n{body_indent}let currentItem = {coll}[i];\n{body_indent}{acc} = {acc} + (currentItem.{p1} * currentItem.{p2});\n{indent}}}"
+    if re.search(js_for_of_cart, res):
+        res = re.sub(js_for_of_cart, repl_js_for_of_cart, res)
+        changes.append("Unpacked `for...of` cart iteration into indexed loop with `currentItem` intermediate variable [Step 2]")
+
     # 7. Java: Generic try/catch -> Contextual logging with fallback defaults
     java_try_catch = r"""(?s)try\s*\{\s*File\s+(\w+)\s*=\s*new\s+File\([^)]+\);\s*Scanner\s+(\w+)\s*=\s*new\s+Scanner\(\1\);\s*\}\s*catch\s*\(\s*FileNotFoundException\s+(\w+)\s*\)\s*\{\s*System\.out\.println\(\s*\"An error occurred\.\"\s*\);\s*\3\.printStackTrace\(\);\s*\}"""
     if re.search(java_try_catch, res):
@@ -857,6 +876,9 @@ def humanize_code(
         updated = line
 
         if should_transform_identifiers:
+            for pat, repl in UNIVERSAL_LEXICAL_CORRUPTIONS:
+                if re.search(pat, updated):
+                    updated = re.sub(pat, repl, updated)
             for pat, repl in chosen_var_set:
                 if re.search(pat, updated):
                     updated = re.sub(pat, repl, updated)
@@ -1021,7 +1043,10 @@ def humanize_code(
         pass3_code = apply_developer_style(pass3_code, cloned_profile, language)
         changes_applied.append(f"Pass 3: Applied Cloned Personal Style ({cloned_profile['summary']})")
 
-    pass3_lines = [l for l in pass3_code.splitlines() if not l.strip().startswith("```") and not l.strip().startswith(("#", "//", "/*", "*"))]
+    if mode == "zero_comment":
+        pass3_lines = [l for l in pass3_code.splitlines() if not l.strip().startswith("```") and not l.strip().startswith(("#", "//", "/*", "*"))]
+    else:
+        pass3_lines = [l for l in pass3_code.splitlines() if not l.strip().startswith("```")]
     pass3_code = "\n".join(pass3_lines).strip()
 
     ok3, err3 = True, None
