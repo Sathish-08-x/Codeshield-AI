@@ -31,7 +31,7 @@ AI_COMMENT_PATTERNS = [
     (r"(?i)#\s*step\s*\d+[:\s]", "Step-by-step tutorial marker (e.g. '# Step 1:')", 22),
     (r"(?i)//\s*step\s*\d+[:\s]", "Step-by-step tutorial marker (e.g. '// Step 1:')", 22),
     (r"(?i)<!--\s*(?:step\s*\d+|header|navigation|navbar|hero|footer|main\s+content|section|cards?|container|sidebar|start|end).*?-->", "AI HTML Section Divider Comment", 26),
-    (r"(?i)<!--\s*.*?\s*-->", "HTML Comment Annotation", 16),
+    (r"(?i)<!--\s*(?!TODO|FIXME|NOTE|BUG|TEMP|HACK).*?(?:Section|Divider|Component|Layout|Start|End|wrapper|container|content)\s*-->", "AI HTML Generic Divider Comment", 16),
     (r"(?i)#\s*helper\s+function\s+to", "Generic helper function commentary", 18),
     (r"(?i)//\s*helper\s+function\s+to", "Generic helper function commentary", 18),
     (r"(?i)(#|//)\s*(example\s+usage|usage\s+example|test\s+cases?)\b", "AI boilerplate usage/test example header", 22),

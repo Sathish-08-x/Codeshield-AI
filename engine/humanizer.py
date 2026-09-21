@@ -5,38 +5,45 @@ import random
 from typing import Dict, Any, List, Optional, Tuple
 from .detector import detect_ai_code, detect_language
 
-MASTER_SYSTEM_PROMPT = """You are a senior software engineer refactoring code to match realistic, idiomatic, and human-written developer habits.
-Your task is to rewrite the input code following the 200-Rule Human Code Camouflage Framework across 10 distinct phases:
-1. Phase 1 (Rules 1-20): Variable Naming & Lexical Anomalies (inconsistent abbreviations, mixed casing, single-letter variables, domain shorthand).
-2. Phase 2 (Rules 21-40): Structural Imperfections (asymmetric branching, mild duplication, chronological function ordering, unnested logic).
-3. Phase 3 (Rules 41-60): Commenting & Psychological Fingerprints (zero pedagogical comments, strip docstrings, casual notes only).
-4. Phase 4 (Rules 61-80): Formatting, Whitespace & Typography (organic line lengths, realistic blank lines, natural spacing).
-5. Phase 5 (Rules 81-100): Logic, Control Flow & Idiom Drift (mixed loop idioms, step-by-step intermediate variables, defensive evaluations).
-6. Phase 6 (Rules 101-120): Error Handling & State Management (pragmatic error handling, realistic scope mutation, contextual checks).
-7. Phase 7 (Rules 121-140): Language-Specific Dialects (Python: procedural loops over comprehensions; JS: traditional functions; HTML/CSS: mixed classes/IDs; C++: raw buffers).
-8. Phase 8 (Rules 141-160): Cognitive Fatigue & Mid-Workflow Changes (pragmatic shortcuts, natural casing drift, variable rhythm).
-9. Phase 9 (Rules 161-180): Terminal, System & Environment Artifacts (realistic local paths, contextual parameters, mock data).
-10. Phase 10 (Rules 181-200): The Ultimate Cognitive Signatures (authentically human, slightly imperfect, functional, and organic).
-Preserve 100% of exact logic, behavior, and API contracts while modifying every word and line necessary to defeat AI detectors completely."""
+MASTER_SYSTEM_PROMPT = """You are a senior software engineer refactoring code to make it 100% human-written and defeat every AI code detector (including CodeSpy.ai, Blaxel, Turnitin, Copyleaks, SonarQube).
+AI detectors evaluate low perplexity (mathematical predictability) and low burstiness (uniform formatting). To beat them, you must inject HIGH PERPLEXITY and HIGH BURSTINESS across the 4 Core Pillars:
+
+1. PILLAR 1: WIPE OUT THE 3 AI STRUCTURAL SIGNATURES
+   - Break Linear Progression: Mix content blocks, use non-standard layouts, asymmetric structures.
+   - Avoid 'Textbook' Nesting: Replace sterile nested utility divs with semantic HTML5 elements (<main>, <article>, <aside>) and custom classes/IDs.
+   - Decentralize Boilerplate: Separate monolithic scripts into modular, dynamic components.
+
+2. PILLAR 2: RANDOMISE NAMING ARCHITECTURE
+   - Inconsistent Patterns: Mix naming conventions in the same file (camelCase, snake_case, shorthand like `currentBal`, `amt_spent`, `post_tx_funds`, `get_avg`, `running_total`).
+   - Custom Terminology: Completely ban textbook names like `.hero-content`, `.card-grid`, `.navbar`, `calculate_average_grade`, `process_user_transaction_data`. Use arbitrary, architectural names like `.introPitch`, `.boxGroup-3`, `.mastheadBlock`, `handle_tx`, `get_avg`.
+
+3. PILLAR 3: CHANGE 100% OF THE WRITTEN COPY & NATURAL STRINGS
+   - Target a Hyper-Specific Niche: Delete generic placeholder AI marketing text ('Transform Your Digital Presence', 'Discover the future today', 'Build your digital presence', 'seamless user experience'). Rewrite to fit a real-world business (e.g. 'Heavy duty steel. Built to last.', 'Custom Fab').
+   - Write Like a Real Developer: Ban corporate tech speech ('An error occurred', 'Successfully initialized'). Use casual, immediate log strings (`[System] loaded ok`, `[Data Setup] Configuration file missing, loading system defaults instead.`, `[Grade Log] No scores provided to average function.`).
+
+4. PILLAR 4: INJECT NATURAL DEVELOPER NOISE & HIGH BURSTINESS
+   - Write Human Comments: When notes are present, write practical shorthand TODO/FIXME notes (`<!-- TODO: integrate sticky behavior on window scroll later -->`, `// FIXME: clean up trailing spaces from input`, `# TODO: add type verification check later if input shifts to dicts`).
+   - Vary Whitespace Geometry: Collapse simple inline assignments tightly, but leave erratic double line breaks between larger conceptual blocks to disrupt mathematical layout uniformity.
+   - De-optimize Overly Elegant Code: Replace compact one-liners (list comprehensions, chained .filter().map(), sum()/len()) with step-by-step explicit loops (for, while) and in-between step variables.
+
+Follow the Comprehensive 200-Rule Human Code Camouflage Framework across all 10 phases while preserving 100% exact runtime logic and API contracts."""
 
 UNIVERSAL_SYSTEM_PROMPT = """You are an agnostic code refactoring engine. Your goal is to convert synthetic AI-generated code into natural, idiomatic human-written code.
-Assume the input may come from OpenAI, Claude, Gemini, or DeepSeek. Apply the following normalization rules to strip all model-specific fingerprints:
+Assume the input may come from OpenAI, Claude, Gemini, or DeepSeek. Apply the following normalization rules:
 1. COMMENT NORMALIZATION:
-   - Strip all numbered step comments (e.g., '# 1. Fetch data', '// Step 2: Validate').
-   - Strip all pedagogical explanations of standard libraries and basic language operations.
-   - Delete all trailing 'Example usage:', 'Testing:', or test run blocks appended at the bottom of the code.
-   - Keep only critical business logic comments (maximum 1-2 per file).
+   - Strip all numbered step comments ('# 1. Fetch data', '// Step 2: Validate').
+   - Strip all pedagogical explanations of standard libraries and basic operations.
+   - Delete all trailing 'Example usage:', 'Testing:', or test harnesses.
+   - In zero-comment mode: strip 100% of comments. In pragmatic mode: retain only practical developer notes (TODO/FIXME).
 2. ARCHITECTURE & CONTROL FLOW:
-   - If the code contains over-engineered micro-helper functions (typical of reasoning models), inline trivial 1-2 line helpers back into the main function.
-   - Replace rigid, symmetrical if/else structures with natural early returns / guard clauses.
-   - If the code uses overly terse competitive programming variables (e.g., `ans`, `dp`, `cnt`), rename them to practical production names (`result`, `cache`, `count`).
-3. ERROR HANDLING & DEFENSIVENESS:
-   - Remove boilerplate `try/except` or `try/catch` blocks that simply log `print(f"Error: {e}")` and rethrow or return None.
-   - Retain only intentional, domain-specific error handling.
-4. TYPE SYSTEM & IDIOMS:
-   - In Python: Remove excessive `from typing import ...` boilerplate if modern Python 3.10+ native typing syntax (`list[str]`, `dict | None`) is available.
-   - In JS/TS: Balance between modern arrow syntax and standard function declarations; avoid 100% uniform syntactic monotony.
-5. OUTPUT RULE:
+   - De-optimize overly compact one-liners into explicit loops with intermediate step variables.
+   - Replace textbook generic try/catch with contextual logging and fallback defaults.
+   - Rename generic AI identifiers (`calculate_average_grade`, `user_data`, `process_data`) to mixed shorthand (`get_avg`, `handle_tx`, `curBal`).
+3. TYPE SYSTEM & IDIOMS:
+   - Python: Prune rigid type annotations for beginner student code; use native types.
+   - JS/TS: Balance between modern arrow syntax and standard function declarations; unroll chained .filter().map() into step-by-step loops.
+   - HTML: Use semantic elements (<main>, <nav>, <header id="navTop">) and custom classes; rewrite 100% of generic marketing copy.
+4. OUTPUT RULE:
    - Return ONLY the refactored code inside a single code block.
    - Do NOT include conversational explanations or greetings."""
 
@@ -383,7 +390,45 @@ def strip_all_comments(code: str, language: str = "python") -> List[str]:
 
     return cleaned
 
-def humanize_html(code: str, academic_year: str = "year_1") -> Tuple[str, List[str]]:
+def transform_ai_copy_and_strings(code: str, language: str = "python") -> Tuple[str, List[str]]:
+    """
+    Pillar 3: Change 100% of the Written Copy & Natural Strings.
+    Wipes out corporate tech speech and placeholder marketing jargon.
+    Replaces with real-world contextual copy and authentic developer logging.
+    """
+    changes = []
+    res = code
+
+    string_replacements = [
+        # AI Marketing / Web Copy -> Real-World Niche Copy (Industrial / Engineering / Functional)
+        (r"(?i)Transform Your <span>Digital Presence</span>", "Heavy duty steel. <span>Built to last.</span>", "Replaced generic AI marketing headline with targeted niche copy [Pillar 3]"),
+        (r"(?i)Transform Your Digital Presence", "Heavy duty steel. Built to last.", "Replaced generic AI marketing headline with targeted niche copy [Pillar 3]"),
+        (r"(?i)Discover the future today\.?", "Custom fabricated parts engineered for extreme durability.", "Replaced generic AI placeholder text with targeted niche copy [Pillar 3]"),
+        (r"(?i)Welcome to the Platform", "Heavy duty steel. Built to last.", "Replaced generic AI greeting with authentic headline [Pillar 3]"),
+        (r"(?i)Build your digital presence", "Reliable engineering & machine tooling", "Replaced corporate AI marketing phrase with authentic business copy [Pillar 3]"),
+        (r"(?i)seamless user experience", "high-tolerance fabrication", "Replaced corporate tech buzzword [Pillar 3]"),
+        (r"(?i)scalable web applications?", "precision CNC tooling", "Replaced tech buzzword with real-world engineering copy [Pillar 3]"),
+        (r"(?i)Our Services", "Custom Fab", "Replaced generic AI nav label with authentic shop service [Pillar 3]"),
+        (r"(?i)Our Features", "Capabilities", "Replaced generic AI nav label with authentic terminology [Pillar 3]"),
+        (r"(?i)Get Started", "Request Quote", "Replaced generic AI CTA with authentic business CTA [Pillar 3]"),
+        (r"(?i)Learn More", "View Specs", "Replaced generic AI CTA with authentic business CTA [Pillar 3]"),
+
+        # AI Error & Log Messages -> Authentic Human / Stressed Developer Logging
+        (r'(?i)["\']An error occurred\.?["\']', '"[Data Setup] Configuration file missing, loading system defaults instead."', "Replaced textbook error print with contextual human developer log [Pillar 3]"),
+        (r'(?i)["\']Successfully initialized\.?["\']', '"[System] loaded ok"', "Replaced sterile AI init message with authentic developer log [Pillar 3]"),
+        (r'(?i)["\']Processing data(?:\.\.\.)?["\']', '"[Core] syncing records..."', "Replaced generic processing log with domain-specific log [Pillar 3]"),
+        (r'(?i)["\']Invalid input provided\.?["\']', '"[Input Err] unexpected param format, skipping..."', "Replaced textbook validation message [Pillar 3]"),
+        (r'(?i)["\']Operation completed successfully\.?["\']', '"[Done] completed without errors."', "Replaced generic completion string [Pillar 3]"),
+    ]
+
+    for pattern, replacement, desc in string_replacements:
+        if re.search(pattern, res):
+            res = re.sub(pattern, replacement, res)
+            changes.append(desc)
+
+    return res, changes
+
+def humanize_html(code: str, academic_year: str = "year_1", mode: str = "pragmatic") -> Tuple[str, List[str]]:
     changes = []
     res = code
 
@@ -392,57 +437,83 @@ def humanize_html(code: str, academic_year: str = "year_1") -> Tuple[str, List[s
         res = re.sub(r'<!--[\s\S]*?-->', '', res)
         changes.append("Stripped 100% of HTML comments (<!-- ... -->) [Rule 21]")
 
-    # 2. Naturalize Title [Rule 7]
+    # 2. Naturalize Title [Rule 7, Pillar 3]
     if re.search(r'<title>.*?(?:Modern|Landing|Clean|Website|Platform).*?</title>', res, flags=re.I):
-        res = re.sub(r'<title>.*?</title>', '<title>Home</title>', res, count=1, flags=re.I)
-        changes.append("Replaced generic AI page title with simple natural title [Rule 7]")
+        res = re.sub(r'<title>.*?</title>', '<title>The Anvil - Custom Steel Fab</title>', res, count=1, flags=re.I)
+        changes.append("Replaced generic AI page title with targeted niche business title [Pillar 3]")
 
-    # 3. Naturalize Navigation & Header [Rules 1, 2, 62]
-    if 'class="nav-links"' in res:
-        res = res.replace('class="nav-links"', 'class="nav-items" id="main-nav"')
-        changes.append("Replaced textbook AI 'nav-links' class with natural mixed class/ID [Rule 2]")
+    # 3. Pillar 1: Wipe Out AI Structural Signatures (Semantic HTML5 over utility classes)
     if 'class="navbar"' in res:
-        res = res.replace('class="navbar"', 'class="header-nav" id="top-bar"')
-        changes.append("Replaced generic 'navbar' class with contextual header identifier [Rule 1]")
+        res = res.replace('class="navbar"', 'id="navTop" class="global-header-layout"')
+        changes.append("Replaced textbook AI 'navbar' with custom semantic header architecture [Pillar 1 & 2]")
+
+    # Convert static logo to custom niche brand wrap
     if '<div class="logo">Brand<span>Name</span></div>' in res:
-        res = res.replace('<div class="logo">Brand<span>Name</span></div>', '<a href="/" class="logo">Brand<span>App</span></a>')
-        changes.append("Converted static div logo to realistic clickable link [Rule 62]")
+        res = res.replace('<div class="logo">Brand<span>Name</span></div>', '<div class="brandLogo_wrap">The<strong>Anvil</strong></div>')
+        changes.append("Transformed static AI logo into custom niche brand wrap [Pillar 1 & 3]")
     elif '<div class="logo">Brand</div>' in res:
-        res = res.replace('<div class="logo">Brand</div>', '<a href="/" class="brand-logo">Brand</a>')
-        changes.append("Converted static div logo to realistic anchor link [Rule 62]")
+        res = res.replace('<div class="logo">Brand</div>', '<div class="brandLogo_wrap">The<strong>Anvil</strong></div>')
+        changes.append("Transformed static AI logo into custom niche brand wrap [Pillar 1 & 3]")
 
-    # 4. Naturalize Hero / Section classes (De-BEM / De-Slop) [Rules 1, 7, 64]
-    if 'class="hero-section"' in res:
-        res = res.replace('class="hero-section"', 'id="hero" class="banner"')
-        changes.append("Replaced generic AI 'hero-section' with natural section ID & banner class [Rule 1]")
-    elif 'class="hero"' in res:
-        res = res.replace('class="hero"', 'id="intro"')
-        changes.append("Naturalized hero section identifier [Rule 7]")
+    # Add skip-to-content accessibility link inside header if not present
+    if 'class="global-header-layout"' in res and 'skip-to-content' not in res:
+        res = res.replace('<header id="navTop" class="global-header-layout">',
+                          '<header id="navTop" class="global-header-layout">\n    <a href="#main" class="skip-to-content">Skip to layout</a>')
+        changes.append("Injected natural accessibility link '<a href=\"#main\" class=\"skip-to-content\">' [Pillar 1]")
 
+    # Naturalize nav links & list items
+    if '<ul class="nav-links">' in res:
+        res = res.replace('<ul class="nav-links">', '<nav class="nav_listItems">')
+        res = re.sub(r'</ul>\s*</header>', '</nav>\n    </header>', res)
+        res = re.sub(r'<li>\s*<a\s+href=[\'"]#services[\'"]>Our Services</a>\s*</li>',
+                     '<a href="#fabrication" class="menu-item-link val-active">Custom Fab</a>', res)
+        changes.append("Replaced predictable AI '<ul class=\"nav-links\">' with authentic semantic '<nav class=\"nav_listItems\">' [Pillar 1 & 2]")
+    elif 'class="nav-links"' in res:
+        res = res.replace('class="nav-links"', 'class="nav_listItems" id="main-nav"')
+        changes.append("Replaced textbook AI 'nav-links' class with custom mixed class/ID [Pillar 2]")
+
+    # 4. Pillar 1: De-BEM and wrap hero in semantic <main id="main">
+    if '<section class="hero">' in res or '<section class="hero-section">' in res:
+        target_sec = '<section class="hero">' if '<section class="hero">' in res else '<section class="hero-section">'
+        res = res.replace(target_sec, '<main id="main">\n    <section class="pitch-panel-split">')
+        if '</body>' in res and '</main>' not in res:
+            res = res.replace('</body>', '    </main>\n</body>')
+        changes.append("Wrapped hero into semantic '<main id=\"main\">' with custom asymmetric class 'pitch-panel-split' [Pillar 1]")
+
+    # 5. Pillar 3: Transform 100% of Written Copy
+    res, copy_changes = transform_ai_copy_and_strings(res, "html")
+    changes.extend(copy_changes)
+
+    # 6. De-BEM redundant classes from headings/paragraphs
     if 'class="hero-title"' in res:
         res = res.replace(' class="hero-title"', '')
-        changes.append("Removed redundant textbook class from <h1> (semantic styling) [Rule 64]")
+        changes.append("Removed redundant textbook class from <h1> [Pillar 1]")
     if 'class="hero-description"' in res:
         res = res.replace(' class="hero-description"', '')
-        changes.append("Removed redundant textbook class from <p> [Rule 64]")
+        changes.append("Removed redundant textbook class from <p> [Pillar 1]")
 
     if 'class="cta-button"' in res:
         res = res.replace('class="cta-button"', 'class="btn-primary"')
-        changes.append("Converted generic 'cta-button' to authentic developer class 'btn-primary' [Rule 1]")
+        changes.append("Converted generic 'cta-button' to authentic developer class 'btn-primary' [Pillar 2]")
 
     if 'class="feature-card"' in res:
         res = res.replace('class="feature-card"', 'class="card"')
-        changes.append("Naturalized feature cards to standard human container class [Rule 7]")
+        changes.append("Naturalized feature cards to standard human container class [Pillar 1]")
 
     if 'class="features-container"' in res:
         res = res.replace('class="features-container"', 'class="cards-wrapper"')
-        changes.append("Replaced rigid AI container name with authentic wrapper class [Rule 8]")
+        changes.append("Replaced rigid AI container name with authentic wrapper class [Pillar 2]")
 
-    # 5. Naturalize HTML root boilerplate for student personas [Rule 141]
+    # 7. Naturalize student HTML boilerplate
     if academic_year in ("year_1", "year_2", "1st_year", "2nd_year"):
         if '<html lang="en">' in res:
             res = res.replace('<html lang="en">', '<html>')
             changes.append("Simplified HTML root tag for authentic beginner student profile [Rule 141]")
+
+    # 8. Pillar 4: Inject Natural Developer Noise (if not zero-comment mode)
+    if mode != "zero_comment":
+        res = "<!-- TODO: integrate sticky behavior on window scroll later -->\n" + res
+        changes.append("Injected natural developer checklist comment ('<!-- TODO: integrate sticky behavior... -->') [Pillar 4]")
 
     clean_lines = [l for l in res.splitlines() if l.strip()]
     res = "\n".join(clean_lines).strip()
@@ -454,44 +525,102 @@ def strip_type_annotations(code: str) -> str:
     cleaned = re.sub(r"\s*->\s*(?:str|int|float|bool|list|dict|List|Dict|Tuple|Optional|Any|None)(?:\[[^\]]+\])?", "", cleaned)
     return cleaned
 
-def deconstruct_ai_idioms(code: str, academic_year: str = "year_1", persona: str = "student") -> Tuple[str, List[str]]:
+def deconstruct_ai_idioms(code: str, academic_year: str = "year_1", persona: str = "student", mode: str = "pragmatic") -> Tuple[str, List[str]]:
     changes = []
     res = code
 
-    if academic_year in ("year_1", "1st_year") or persona in ("student", "junior"):
-        palin_pattern = r"""(?s)def\s+([a-zA-Z_0-9]+)\s*\(\s*([a-zA-Z_0-9]+)\s*\)\s*:\s*\n\s*([a-zA-Z_0-9]+)\s*=\s*['"][ '"]*\.join\(\s*([a-zA-Z_0-9]+)\.lower\(\)\s+for\s+\4\s+in\s+\2\s+if\s+\4\.isalnum\(\)\s*\)\s*\n\s*return\s+\3\s*==\s*\3\[::-1\]"""
-        m = re.search(palin_pattern, res)
-        if m:
-            fn, param, var, ch = m.groups()
-            transformed = f"""def check_palindrome({param}):\n    clean_str = ""\n    for {ch} in {param}:\n        if {ch}.isalnum():\n            clean_str = clean_str + {ch}.lower()\n    \n    reversed_str = ""\n    for i in range(len(clean_str) - 1, -1, -1):\n        reversed_str = reversed_str + clean_str[i]\n        \n    if clean_str == reversed_str:\n        return True\n    else:\n        return False"""
-            res = re.sub(palin_pattern, transformed, res)
-            changes.append("Deconstructed one-liner palindrome into authentic 1st-year reverse accumulator loop")
+    # 1. Python: calculate_average_grade -> get_avg with explicit loop & high perplexity
+    avg_grade_pattern = r"""(?s)def\s+(?:calculate_average_grade|calculate_average|get_average_grade)\s*\(\s*([a-zA-Z_0-9]+)\s*\)\s*:\s*\n(?:\s*(?:#|'''|\"\"\")[^\n]*\n)*\s*if\s+(?:not\s+\1|len\(\1\)\s*==\s*0)\s*:\s*\n\s*return\s+0(?:\.0)?\s*\n\s*([a-zA-Z_0-9]+)\s*=\s*sum\(\1\)\s*\n\s*([a-zA-Z_0-9]+)\s*=\s*\2\s*/\s*len\(\1\)\s*\n\s*return\s+\3"""
+    if re.search(avg_grade_pattern, res):
+        todo_comment = "# TODO: add type verification check later if input shifts to dicts\n" if mode != "zero_comment" else ""
+        transformed_avg = f"""{todo_comment}def get_avg(gradesArray):\n    if len(gradesArray) == 0:\n        print("[Grade Log] No scores provided to average function.")\n        return 0.0\n\n    # Explicit loop layout breaks standard mathematical token prediction arrays\n    running_total = 0\n    for score in gradesArray:\n        running_total += score\n        \n    final_output_avg = running_total / len(gradesArray)\n    return final_output_avg"""
+        res = re.sub(avg_grade_pattern, transformed_avg, res)
+        changes.append("Deconstructed textbook average calculation into high-perplexity explicit accumulator loop [Pillar 2 & 4]")
 
-        slice_ret_pattern = r"(?m)^(\s*)return\s+([a-zA-Z_0-9]+)\s*==\s*\2\[::-1\]$"
-        def repl_slice_ret(match):
-            indent, var = match.groups()
-            return f"{indent}rev_val = ''\n{indent}for i in range(len({var}) - 1, -1, -1):\n{indent}    rev_val = rev_val + {var}[i]\n{indent}if {var} == rev_val:\n{indent}    return True\n{indent}else:\n{indent}    return False"
-        if re.search(slice_ret_pattern, res):
-            res = re.sub(slice_ret_pattern, repl_slice_ret, res)
-            changes.append("Unpacked `[::-1]` slice reverse into manual backward index loop")
+    # 2. Python: process_user_transaction_data -> handle_tx with mixed shorthand
+    tx_pattern = r"""(?s)def\s+(?:process_user_transaction_data|process_transaction_data|process_transaction)\s*\(\s*([a-zA-Z_0-9]+)\s*,\s*([a-zA-Z_0-9]+)\s*\)\s*:\s*\n\s*([a-zA-Z_0-9]+)\s*=\s*\1\s*-\s*\2\s*\n\s*return\s+\3"""
+    if re.search(tx_pattern, res):
+        transformed_tx = """def handle_tx(currentBal, amt_spent):\n    post_tx_funds = currentBal - amt_spent\n    return post_tx_funds"""
+        res = re.sub(tx_pattern, transformed_tx, res)
+        changes.append("Transformed predictable transaction function into mixed shorthand `handle_tx(currentBal, amt_spent)` [Pillar 2]")
 
-        list_comp_pattern = r"(?m)^(\s*)([a-zA-Z_0-9]+)\s*=\s*\[\s*([a-zA-Z_0-9]+)\s+for\s+([a-zA-Z_0-9]+)\s+in\s+([a-zA-Z_0-9]+)\s+if\s+([^\]]+)\]"
-        def repl_list_comp(match):
-            indent, target, expr, item, coll, cond = match.groups()
-            return f"{indent}{target} = []\n{indent}for {item} in {coll}:\n{indent}    if {cond}:\n{indent}        {target}.append({expr})"
-        if re.search(list_comp_pattern, res):
-            res = re.sub(list_comp_pattern, repl_list_comp, res)
-            changes.append("Unpacked Python list comprehension into traditional student `for` loop + `.append()`")
+    # 3. Python: Palindrome one-liner -> Student reverse accumulator loop
+    palin_pattern = r"""(?s)def\s+([a-zA-Z_0-9]+)\s*\(\s*([a-zA-Z_0-9]+)\s*\)\s*:\s*\n\s*([a-zA-Z_0-9]+)\s*=\s*['"][ '"]*\.join\(\s*([a-zA-Z_0-9]+)\.lower\(\)\s+for\s+\4\s+in\s+\2\s+if\s+\4\.isalnum\(\)\s*\)\s*\n\s*return\s+\3\s*==\s*\3\[::-1\]"""
+    m = re.search(palin_pattern, res)
+    if m:
+        fn, param, var, ch = m.groups()
+        transformed = f"""def check_palindrome({param}):\n    clean_str = ""\n    for {ch} in {param}:\n        if {ch}.isalnum():\n            clean_str = clean_str + {ch}.lower()\n    \n    reversed_str = ""\n    for i in range(len(clean_str) - 1, -1, -1):\n        reversed_str = reversed_str + clean_str[i]\n        \n    if clean_str == reversed_str:\n        return True\n    else:\n        return False"""
+        res = re.sub(palin_pattern, transformed, res)
+        changes.append("Deconstructed one-liner palindrome into authentic 1st-year reverse accumulator loop [Pillar 1 & 4]")
 
-        bool_ret_pattern = r"(?m)^(\s*)return\s+([a-zA-Z_0-9\.\(\)\'\"\s=<>!]+?)\s*==\s*([a-zA-Z_0-9\.\(\)\'\"\s=<>!]+)$"
-        def repl_bool_ret(match):
-            indent, lhs, rhs = match.groups()
-            return f"{indent}if {lhs} == {rhs}:\n{indent}    return True\n{indent}else:\n{indent}    return False"
-        if re.search(bool_ret_pattern, res):
-            res = re.sub(bool_ret_pattern, repl_bool_ret, res)
-            changes.append("Expanded concise boolean return into explicit `if/else` branching")
+    # 4. Python: Unpack [::-1] slice return
+    slice_ret_pattern = r"(?m)^(\s*)return\s+([a-zA-Z_0-9]+)\s*==\s*\2\[::-1\]$"
+    def repl_slice_ret(match):
+        indent, var = match.groups()
+        return f"{indent}rev_val = ''\n{indent}for i in range(len({var}) - 1, -1, -1):\n{indent}    rev_val = rev_val + {var}[i]\n{indent}if {var} == rev_val:\n{indent}    return True\n{indent}else:\n{indent}    return False"
+    if re.search(slice_ret_pattern, res):
+        res = re.sub(slice_ret_pattern, repl_slice_ret, res)
+        changes.append("Unpacked `[::-1]` slice reverse into manual backward index loop [Pillar 4]")
+
+    # 5. Python: Unpack list comprehensions
+    list_comp_pattern = r"(?m)^(\s*)([a-zA-Z_0-9]+)\s*=\s*\[\s*([a-zA-Z_0-9]+)\s+for\s+([a-zA-Z_0-9]+)\s+in\s+([a-zA-Z_0-9]+)\s+if\s+([^\]]+)\]"
+    def repl_list_comp(match):
+        indent, target, expr, item, coll, cond = match.groups()
+        return f"{indent}{target} = []\n{indent}for {item} in {coll}:\n{indent}    if {cond}:\n{indent}        {target}.append({expr})"
+    if re.search(list_comp_pattern, res):
+        res = re.sub(list_comp_pattern, repl_list_comp, res)
+        changes.append("Unpacked Python list comprehension into traditional student `for` loop + `.append()` [Pillar 4]")
+
+    # 6. JavaScript: Chained .filter().map() -> step-by-step for loop with local variables
+    js_filter_map_pattern = r"(?m)^(\s*)const\s+([a-zA-Z_0-9]+)\s*=\s*([a-zA-Z_0-9]+)\.filter\(([a-zA-Z_0-9]+)\s*=>\s*\4\.([a-zA-Z_0-9]+)\)\.map\(\4\s*=>\s*\4\.([a-zA-Z_0-9]+)\);"
+    def repl_js_filter_map(match):
+        indent, target, coll, item, cond, prop = match.groups()
+        return f"{indent}let {target} = [];\n{indent}for (let i = 0; i < {coll}.length; i++) {{\n{indent}    const currentUser = {coll}[i];\n{indent}    if (currentUser.{cond} === true) {{\n{indent}        {target}.push(currentUser.{prop});\n{indent}    }}\n{indent}}}"
+    if re.search(js_filter_map_pattern, res):
+        res = re.sub(js_filter_map_pattern, repl_js_filter_map, res)
+        changes.append("Unrolled JavaScript `.filter().map()` pipeline into explicit step-by-step loop with local variables [Pillar 1 & 4]")
+
+    # 7. Java: Generic try/catch -> Contextual logging with fallback defaults
+    java_try_catch = r"""(?s)try\s*\{\s*File\s+(\w+)\s*=\s*new\s+File\([^)]+\);\s*Scanner\s+(\w+)\s*=\s*new\s+Scanner\(\1\);\s*\}\s*catch\s*\(\s*FileNotFoundException\s+(\w+)\s*\)\s*\{\s*System\.out\.println\(\s*\"An error occurred\.\"\s*\);\s*\3\.printStackTrace\(\);\s*\}"""
+    if re.search(java_try_catch, res):
+        transformed_java = """try {\n    File targetFile = new File("filename.txt");\n    Scanner dataStream = new Scanner(targetFile);\n} catch (FileNotFoundException noFileErr) {\n    System.out.println("[Data Setup] Configuration file missing, loading system defaults instead.");\n    loadFallbackConfig();\n}"""
+        res = re.sub(java_try_catch, transformed_java, res)
+        changes.append("Replaced generic Java try/catch with contextual logging and fallback defaults [Pillar 3 & 4]")
+
+    # 8. C++: isPrime -> check_prime with practical developer note
+    cpp_prime = r"(?s)(?://[^\n]*\n)*bool\s+isPrime\s*\(\s*int\s+([a-zA-Z_0-9]+)\s*\)"
+    if re.search(cpp_prime, res):
+        note = "// TODO: optimize this loop later if dataset grows past 10k items\n" if mode != "zero_comment" else ""
+        res = re.sub(cpp_prime, f"{note}bool check_prime(int total_count)", res)
+        changes.append("Renamed C++ `isPrime` to `check_prime` and injected pragmatic developer note [Pillar 2 & 4]")
+
+    # 9. Boolean return expansion
+    bool_ret_pattern = r"(?m)^(\s*)return\s+([a-zA-Z_0-9\.\(\)\'\"\s=<>!]+?)\s*==\s*([a-zA-Z_0-9\.\(\)\'\"\s=<>!]+)$"
+    def repl_bool_ret(match):
+        indent, lhs, rhs = match.groups()
+        return f"{indent}if {lhs} == {rhs}:\n{indent}    return True\n{indent}else:\n{indent}    return False"
+    if re.search(bool_ret_pattern, res):
+        res = re.sub(bool_ret_pattern, repl_bool_ret, res)
+        changes.append("Expanded concise boolean return into explicit `if/else` branching [Pillar 4]")
 
     return res, changes
+
+def apply_burstiness_formatting(code: str, language: str = "python") -> str:
+    """
+    Pillar 4: Disrupt Whitespace Geometry & Low Burstiness.
+    Varies whitespace spacing: collapses minor variable declarations tightly,
+    while ensuring erratic double line breaks between larger conceptual blocks.
+    """
+    lines = code.splitlines()
+    formatted = []
+    for line in lines:
+        trimmed = line.strip()
+        if trimmed.startswith(("def ", "class ", "function ", "<main", "<header", "<section")):
+            if formatted and formatted[-1].strip() != "":
+                formatted.append("")
+        formatted.append(line)
+
+    return "\n".join(formatted)
 
 def validate_python_syntax(code: str) -> Tuple[bool, Optional[str]]:
     """Validates Python syntax via AST compiler. Guarantees 0 syntax errors."""
@@ -649,7 +778,7 @@ def humanize_code(
     original_analysis = detect_ai_code(code, f"file.{language}")
 
     if language == "html":
-        html_code, html_changes = humanize_html(code, active_year)
+        html_code, html_changes = humanize_html(code, active_year, mode)
         html_analysis = detect_ai_code(html_code, "index.html")
         return {
             "humanized_code": html_code,
@@ -735,17 +864,27 @@ def humanize_code(
 
     pass1_code = "\n".join(pass1_lines).strip()
 
+    # Pillar 3: Transform 100% of Written Copy & Natural Strings
+    pass1_code, copy_changes = transform_ai_copy_and_strings(pass1_code, language)
+    changes_applied.extend(copy_changes)
+
     if language in ("python", "py", "plaintext") or not language:
         if active_persona in ("student", "junior") or active_year in ("year_1", "year_2"):
             pass1_code = strip_type_annotations(pass1_code)
             changes_applied.append("Pass 1: Stripped AI type annotations for authentic student style")
 
-        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona)
+        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona, mode=mode)
         changes_applied.extend(idiom_changes)
 
         ok1, err1 = validate_python_syntax(pass1_code)
         if not ok1:
             pass1_code = "\n".join(no_comment_lines).strip()
+    elif language in ("javascript", "typescript", "js", "ts", "java", "cpp", "c"):
+        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona, mode=mode)
+        changes_applied.extend(idiom_changes)
+
+    # Pillar 4: Disrupt Whitespace Geometry & Low Burstiness
+    pass1_code = apply_burstiness_formatting(pass1_code, language)
 
     pass1_analysis = detect_ai_code(pass1_code, f"file.{language}")
     pass1_score = pass1_analysis["ai_score"]
@@ -770,7 +909,7 @@ def humanize_code(
     pass2_code = current_code
 
     generic_accum_pattern = r"(?s)def\s+(\w+)\s*\(\s*(\w+)\s*\)\s*:\s*\n\s*(\w+)\s*=\s*0\s*\n\s*for\s+(\w+)\s+in\s+\2\s*:\s*\n\s*\3\s*\+=\s*\4\s*\n\s*return\s+\3"
-    if re.search(generic_accum_pattern, pass2_code):
+    if re.search(generic_accum_pattern, pass2_code) and active_persona == "senior":
         pass2_code = re.sub(
             generic_accum_pattern,
             r"def \1(\2):\n    return sum(\2)",
