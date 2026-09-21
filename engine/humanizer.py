@@ -610,7 +610,7 @@ def strip_type_annotations(code: str) -> str:
     cleaned = re.sub(r"\s*->\s*(?:str|int|float|bool|list|dict|List|Dict|Tuple|Optional|Any|None)(?:\[[^\]]+\])?", "", cleaned)
     return cleaned
 
-def deconstruct_ai_idioms(code: str, academic_year: str = "year_1", persona: str = "student", mode: str = "pragmatic") -> Tuple[str, List[str]]:
+def deconstruct_ai_idioms(code: str, academic_year: str = "year_1", persona: str = "student", mode: str = "pragmatic", language: str = "python") -> Tuple[str, List[str]]:
     changes = []
     res = code
 
@@ -759,10 +759,24 @@ def clean_ai_artifacts(code: str, language: str = "python") -> str:
     STAGE 1: Deterministic regex de-bloating pass targeting universal AI artifacts
     from OpenAI, Anthropic Claude, Google Gemini, DeepSeek, and Meta Llama / Copilot.
     """
-    if not code:
-        return ""
-
     cleaned = code
+
+    # 1. Remove all JSDoc and multi-line block comments (/* ... */)
+    cleaned = re.sub(r'/\*\*[\s\S]*?\*/', '', cleaned)
+    cleaned = re.sub(r'/\*[\s\S]*?\*/', '', cleaned)
+
+    # 2. Remove single-line comments globally based on language
+    if language in ("javascript", "typescript", "js", "ts", "java", "cpp", "c", "csharp"):
+        cleaned = re.sub(r'(?m)^\s*//.*$', '', cleaned)
+    elif language in ("python", "py", "bash", "sh"):
+        cleaned = re.sub(r'(?m)^\s*#(?!\s*(?:!|coding)).*$', '', cleaned)
+    elif language in ("html",):
+        cleaned = re.sub(r'<!--[\s\S]*?-->', '', cleaned)
+
+    # 3. Clean up repetitive AI error messages and boilerplate logging strings
+    cleaned = re.sub(r'\[Validation Critical Error\]:?\.?', 'Error:', cleaned)
+    cleaned = re.sub(r'Critical failure encountered during[a-zA-Z0-9\s]+:', 'Failed:', cleaned)
+
     cleaned = re.sub(r'(?i)(#|//)\s*(?:Here is the complete code|Make sure to install|Replace with your key|Note:|Replace your API key|Install via pip|In production you should).*', '', cleaned)
     cleaned = re.sub(r'(?m)^\s*(?:#|//)\s*(?:Step\s*)?\d+[\.:\)]\s*.*$', '', cleaned)
     cleaned = re.sub(r'(?m)^\s*(?:#|//)\s*(?:Uses|Utilizes|Implements)\s+.*?(?:technique|algorithm|O\(n\)|two-pointer|sliding\s+window).*$', '', cleaned)
@@ -1014,6 +1028,24 @@ def humanize_code(
 
     pass1_code = "\n".join(pass1_lines).strip()
 
+    # Dynamic token shrinking: Shorten long, robotic AI variable names to concise human equivalents
+    # Replaces overly descriptive camelCase words like "incomingFormDataObject" -> "formDataObject"
+    def shrink_camel(m):
+        prefix, rest = m.group(1), m.group(2)
+        return rest[0].lower() + rest[1:]
+
+    pass1_code = re.sub(
+        r'\b(incoming|extracted|finalized|processed|unexpected|temporary|calculated|formatted|sanitized|validated|current|structured|updated|generated|retrieved)([A-Z][a-zA-Z0-9]*)\b',
+        shrink_camel,
+        pass1_code
+    )
+    # Snake_case dynamic token shrinking: "incoming_data_object" -> "data_object"
+    pass1_code = re.sub(
+        r'\b(incoming|extracted|finalized|processed|unexpected|temp|temporary|calculated|formatted|sanitized|validated|current|structured|updated|generated|retrieved)_([a-zA-Z0-9_]+)\b',
+        r'\2',
+        pass1_code
+    )
+
     # Pillar 3: Transform 100% of Written Copy & Natural Strings
     pass1_code, copy_changes = transform_ai_copy_and_strings(pass1_code, language)
     changes_applied.extend(copy_changes)
@@ -1023,14 +1055,14 @@ def humanize_code(
             pass1_code = strip_type_annotations(pass1_code)
             changes_applied.append("Pass 1: Stripped AI type annotations for authentic student style")
 
-        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona, mode=mode)
+        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona, mode=mode, language=language)
         changes_applied.extend(idiom_changes)
 
         ok1, err1 = validate_python_syntax(pass1_code)
         if not ok1:
             pass1_code = "\n".join(no_comment_lines).strip()
     elif language in ("javascript", "typescript", "js", "ts", "java", "cpp", "c"):
-        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona, mode=mode)
+        pass1_code, idiom_changes = deconstruct_ai_idioms(pass1_code, academic_year=active_year, persona=active_persona, mode=mode, language=language)
         changes_applied.extend(idiom_changes)
 
     # Pillar 4: Disrupt Whitespace Geometry & Low Burstiness

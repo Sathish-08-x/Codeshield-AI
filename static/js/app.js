@@ -3335,6 +3335,14 @@ const calculateDiscount = (orderTotal, discountRate) => {
       }
     }
 
+    // Dynamic token shrinking: Shorten long, robotic AI variable names to concise human equivalents
+    cleaned = cleaned.replace(/\b(incoming|extracted|finalized|processed|unexpected|temporary|calculated|formatted|sanitized|validated|current|structured|updated|generated|retrieved)([A-Z][a-zA-Z0-9]*)\b/g, (match, prefix, rest) => {
+      return rest.charAt(0).toLowerCase() + rest.slice(1);
+    });
+    cleaned = cleaned.replace(/\b(incoming|extracted|finalized|processed|unexpected|temp|temporary|calculated|formatted|sanitized|validated|current|structured|updated|generated|retrieved)_([a-zA-Z0-9_]+)\b/g, '$2');
+    cleaned = cleaned.replace(/\[Validation Critical Error\]:?\.?/g, 'Error:');
+    cleaned = cleaned.replace(/Critical failure encountered during[a-zA-Z0-9\s]+:/g, 'Failed:');
+
     const studentVars = [
       [/\bgrade_records\b/g, "student_records"],
       [/\bstudent_item\b/g, "student"],
