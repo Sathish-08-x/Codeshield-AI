@@ -81,7 +81,7 @@ class SettingsRequest(BaseModel):
     particle_density: Optional[str] = "high"
     glow_intensity: Optional[int] = 85
     scanlines_enabled: Optional[bool] = True
-    sound_fx_enabled: Optional[bool] = True
+    sound_fx_enabled: Optional[bool] = False
     custom_accent_color: Optional[str] = "#00f0ff"
 
 class DeveloperProfileRequest(BaseModel):

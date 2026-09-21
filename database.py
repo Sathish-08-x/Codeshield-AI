@@ -54,7 +54,7 @@ def init_db():
         particle_density TEXT DEFAULT 'high',
         glow_intensity INTEGER DEFAULT 85,
         scanlines_enabled INTEGER DEFAULT 1,
-        sound_fx_enabled INTEGER DEFAULT 1,
+        sound_fx_enabled INTEGER DEFAULT 0,
         custom_accent_color TEXT DEFAULT '#00f0ff',
         updated_at TEXT NOT NULL
     )
@@ -80,7 +80,7 @@ def init_db():
     if not cur.fetchone():
         cur.execute("""
         INSERT INTO user_settings (id, theme, font, particle_mode, particle_density, glow_intensity, scanlines_enabled, sound_fx_enabled, custom_accent_color, updated_at)
-        VALUES (1, 'cyberpunk', 'JetBrains Mono', 'cyber_grid', 'high', 85, 1, 1, '#00f0ff', ?)
+        VALUES (1, 'cyberpunk', 'JetBrains Mono', 'cyber_grid', 'high', 85, 1, 0, '#00f0ff', ?)
         """, (datetime.now(timezone.utc).isoformat(),))
         
     cur.execute("SELECT id FROM developer_profile WHERE id = 1")
@@ -243,7 +243,7 @@ def update_user_settings(settings: Dict[str, Any]) -> Dict[str, Any]:
         settings.get("particle_density", "high"),
         int(settings.get("glow_intensity", 85)),
         1 if settings.get("scanlines_enabled", True) else 0,
-        1 if settings.get("sound_fx_enabled", True) else 0,
+        1 if settings.get("sound_fx_enabled", False) else 0,
         settings.get("custom_accent_color", "#00f0ff"),
         datetime.now(timezone.utc).isoformat()
     ))

@@ -297,168 +297,17 @@ class VFXEngine {
 class SoundEngine {
   constructor() {
     this.ctx = null;
-    this.enabled = true;
-    this.volume = 0.4;
+    this.enabled = false;
+    this.volume = 0;
   }
 
-  initAudioContext() {
-    if (!this.ctx) {
-      const AudioContext = window.AudioContext || window.webkitAudioContext;
-      if (AudioContext) {
-        this.ctx = new AudioContext();
-      }
-    }
-    if (this.ctx && this.ctx.state === 'suspended') {
-      this.ctx.resume();
-    }
-  }
-
-  playClick() {
-    if (!this.enabled) return;
-    this.initAudioContext();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(300, this.ctx.currentTime + 0.04);
-
-    gain.gain.setValueAtTime(this.volume * 0.25, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.04);
-  }
-
-  playScan() {
-    if (!this.enabled) return;
-    this.initAudioContext();
-    if (!this.ctx) return;
-
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-    const filter = this.ctx.createBiquadFilter();
-
-    osc.type = 'sawtooth';
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(300, this.ctx.currentTime);
-    filter.frequency.exponentialRampToValueAtTime(2200, this.ctx.currentTime + 0.5);
-
-    osc.frequency.setValueAtTime(180, this.ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(540, this.ctx.currentTime + 0.5);
-
-    gain.gain.setValueAtTime(this.volume * 0.35, this.ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.6);
-
-    osc.connect(filter);
-    filter.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start();
-    osc.stop(this.ctx.currentTime + 0.6);
-  }
-
-  playAlert() {
-    if (!this.enabled) return;
-    this.initAudioContext();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    [480, 620].forEach((freq, i) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(freq, now + i * 0.12);
-
-      gain.gain.setValueAtTime(this.volume * 0.35, now + i * 0.12);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.12 + 0.2);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now + i * 0.12);
-      osc.stop(now + i * 0.12 + 0.2);
-    });
-  }
-
-  playHumanize() {
-    if (!this.enabled) return;
-    this.initAudioContext();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const chord = [523.25, 659.25, 783.99, 1046.50];
-
-    chord.forEach((freq, idx) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.06);
-
-      gain.gain.setValueAtTime(this.volume * 0.25, now + idx * 0.06);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.06 + 0.55);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now + idx * 0.06);
-      osc.stop(now + idx * 0.06 + 0.6);
-    });
-  }
-
-  playSuccess() {
-    if (!this.enabled) return;
-    this.initAudioContext();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    [440, 660, 880].forEach((freq, idx) => {
-      const osc = this.ctx.createOscillator();
-      const gain = this.ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.08);
-
-      gain.gain.setValueAtTime(this.volume * 0.25, now + idx * 0.08);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.4);
-
-      osc.connect(gain);
-      gain.connect(this.ctx.destination);
-
-      osc.start(now + idx * 0.08);
-      osc.stop(now + idx * 0.08 + 0.45);
-    });
-  }
-
-  playRadarPing() {
-    if (!this.enabled) return;
-    this.initAudioContext();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
-
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1240, now);
-    osc.frequency.exponentialRampToValueAtTime(620, now + 0.35);
-
-    gain.gain.setValueAtTime(this.volume * 0.28, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.65);
-
-    osc.connect(gain);
-    gain.connect(this.ctx.destination);
-
-    osc.start(now);
-    osc.stop(now + 0.65);
-  }
+  initAudioContext() {}
+  playClick() {}
+  playScan() {}
+  playAlert() {}
+  playHumanize() {}
+  playSuccess() {}
+  playRadarPing() {}
 }
 
 window.vfx = new VFXEngine();

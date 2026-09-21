@@ -1,7 +1,7 @@
 if (!window.sound) {
   window.sound = {
-    enabled: true,
-    volume: 0.4,
+    enabled: false,
+    volume: 0,
     playClick: () => {},
     playScan: () => {},
     playAlert: () => {},
@@ -2298,9 +2298,10 @@ const calculateDiscount = (orderTotal, discountRate) => {
   }
 
   setSound(enabled) {
-    window.sound.enabled = enabled;
-    this.soundMuteNavBtn.innerHTML = enabled ? '🔊' : '🔇';
-    this.soundMuteNavBtn.title = enabled ? 'Sound FX Enabled (Click to Mute)' : 'Sound FX Muted';
+    window.sound.enabled = false;
+    if (this.soundMuteNavBtn) {
+      this.soundMuteNavBtn.style.display = 'none';
+    }
   }
 
   async loadSettings() {
