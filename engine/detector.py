@@ -28,22 +28,26 @@ LANG_EXTENSIONS = {
 }
 
 AI_COMMENT_PATTERNS = [
-    (r"(?i)#\s*step\s*\d+[:\s]", "Step-by-step tutorial marker (e.g. '# Step 1:')", 18),
-    (r"(?i)//\s*step\s*\d+[:\s]", "Step-by-step tutorial marker (e.g. '// Step 1:')", 18),
-    (r"(?i)#\s*helper\s+function\s+to", "Generic helper function commentary", 15),
-    (r"(?i)//\s*helper\s+function\s+to", "Generic helper function commentary", 15),
-    (r"(?i)(#|//)\s*(example\s+usage|usage\s+example|test\s+cases?)\b", "AI boilerplate usage/test example header", 18),
-    (r"(?i)(#|//)\s*initialize\s+(the\s+)?(variables?|data|list|array|dictionary|state)", "Trivial AI initialization comment", 12),
-    (r"(?i)(#|//)\s*define\s+(the\s+)?(function|class|method|schema|route|model)", "Redundant definition comment", 12),
-    (r"(?i)(#|//)\s*handle\s+(the\s+)?(error|exception|case|event)", "Generic error-handling comment", 10),
-    (r"(?i)(#|//)\s*check\s+if\s+(the\s+)?[a-z_0-9]+\s+is\s+valid", "Generic validation comment", 12),
-    (r"(?i)(#|//)\s*print\s+(the\s+)?(result|output|response)", "Trivial print output comment", 12),
-    (r"(?i)(#|//)\s*create\s+an\s+instance\s+of", "Textbook instantiation comment", 12),
-    (r"(?i)(#|//)\s*loop\s+through\s+(each\s+|the\s+)", "Trivial loop explanation", 14),
-    (r"(?i)(#|//)\s*return\s+(the\s+)?(result|response|value|sum|boolean)", "Trivial return statement comment", 12),
-    (r"(?i)(#|//)\s*here\s+(we|is\s+where\s+we)\b", "Conversational AI tutorial phrasing ('Here we...')", 20),
-    (r"(?i)(#|//)\s*note:\s*(you\s+can|this\s+is\s+a\s+simplified|in\s+production)", "Conversational AI disclaimer note", 22),
-    (r"^```[a-z]*\s*$", "Markdown code fence artifact left in file", 30),
+    (r"(?i)#\s*step\s*\d+[:\s]", "Step-by-step tutorial marker (e.g. '# Step 1:')", 22),
+    (r"(?i)//\s*step\s*\d+[:\s]", "Step-by-step tutorial marker (e.g. '// Step 1:')", 22),
+    (r"(?i)<!--\s*(?:step\s*\d+|header|navigation|navbar|hero|footer|main\s+content|section|cards?|container|sidebar|start|end).*?-->", "AI HTML Section Divider Comment", 26),
+    (r"(?i)<!--\s*.*?\s*-->", "HTML Comment Annotation", 16),
+    (r"(?i)#\s*helper\s+function\s+to", "Generic helper function commentary", 18),
+    (r"(?i)//\s*helper\s+function\s+to", "Generic helper function commentary", 18),
+    (r"(?i)(#|//)\s*(example\s+usage|usage\s+example|test\s+cases?)\b", "AI boilerplate usage/test example header", 22),
+    (r"(?i)(#|//)\s*initialize\s+(the\s+)?(variables?|data|list|array|dictionary|state)", "Trivial AI initialization comment", 16),
+    (r"(?i)(#|//)\s*define\s+(the\s+)?(function|class|method|schema|route|model)", "Redundant definition comment", 15),
+    (r"(?i)(#|//)\s*handle\s+(the\s+)?(error|exception|case|event)", "Generic error-handling comment", 14),
+    (r"(?i)(#|//)\s*check\s+if\s+(the\s+)?[a-z_0-9]+\s+is\s+valid", "Generic validation comment", 15),
+    (r"(?i)(#|//)\s*print\s+(the\s+)?(result|output|response)", "Trivial print output comment", 14),
+    (r"(?i)(#|//)\s*create\s+an\s+instance\s+of", "Textbook instantiation comment", 14),
+    (r"(?i)(#|//)\s*loop\s+through\s+(each\s+|the\s+)", "Trivial loop explanation", 16),
+    (r"(?i)(#|//)\s*return\s+(the\s+)?(result|response|value|sum|boolean|true|false)", "Trivial return statement comment", 15),
+    (r"(?i)(#|//)\s*here\s+(we|is\s+where\s+we)\b", "Conversational AI tutorial phrasing ('Here we...')", 24),
+    (r"(?i)(#|//)\s*note:\s*(you\s+can|this\s+is\s+a\s+simplified|in\s+production)", "Conversational AI disclaimer note", 24),
+    (r"(?i)(#|//)\s*(base\s+case|recursive\s+case|recursive\s+step)\b", "Textbook algorithmic comment", 18),
+    (r"(?i)(#|//)\s*(time\s+complexity|space\s+complexity|o\([n1log\s]+\))\b", "Pedagogical complexity remark", 20),
+    (r"^```[a-z]*\s*$", "Markdown code fence artifact left in file", 35),
 ]
 
 AI_NAMING_PATTERNS = [
@@ -52,8 +56,27 @@ AI_NAMING_PATTERNS = [
     r"\b(sanitizedUserList|sanitized_user_list|currentIterationIndex|current_iteration_index|temporaryBufferData|temp_buffer_data)\b",
     r"\b(isUserCurrentlyActive|is_user_currently_active|calculatedTotalDiscountAmount|calculated_total_discount_amount)\b",
     r"\b(calculate_total\w*|process_data\w*|process_student\w*|handle_request\w*|fetch_user\w*|validate_input\w*)\b",
-    r"\b(dummy_data|sample_data|mock_data|test_input|input_values)\b",
-    r"\b(is_valid|has_error|success_flag|status_code_ok)\b"
+    r"\b(dummy_data|sample_data|mock_data|test_input|input_values|test_cases)\b",
+    r"\b(is_valid|has_error|success_flag|status_code_ok|is_palindrome|cleaned_text|cleaned_str|cleaned)\b",
+    r"\b(char_count|word_count|filtered_words|target_sum|current_sum|num_list|string_val)\b",
+    r"\b(nav-links|hero-section|feature-card|features-container|cta-button|logo-text|footer-links)\b"
+]
+
+AI_SYNTAX_PATTERNS = [
+    (r"(?i)<!DOCTYPE\s+html>\s*<html\s+lang=[\"']en[\"']>\s*<head>\s*<meta\s+charset=[\"']UTF-8[\"']>", "Sterile AI boilerplate HTML5 skeleton", 30),
+    (r"(?i)<header\s+class=[\"']navbar[\"']>\s*<div\s+class=[\"']logo[\"']>[^<]*<span>[^<]*</span></div>\s*<nav>\s*<ul\s+class=[\"']nav-links[\"']>", "Stereotypical AI navbar/landing page layout", 32),
+    (r"def\s+[a-zA-Z_0-9]+\s*\([^)]*?:\s*(?:str|int|float|bool|list|dict|List|Dict|Tuple|Optional|Any)[^)]*?\)\s*->\s*(?:str|int|float|bool|list|dict|List|Dict|Tuple|Optional|Any|None)", "Rigid AI type-annotated function signature", 28),
+    (r'(?:""|"\s*")\.join\(\s*[a-zA-Z_0-9]+\s+for\s+[a-zA-Z_0-9]+\s+in\s+[^)]*?\)', "Chained generator expression inside string join", 25),
+    (r"\[\s*[a-zA-Z_0-9]+\s*(?:\.[a-zA-Z_0-9]+\(\))?\s+for\s+[a-zA-Z_0-9]+\s+in\s+[^\]]+?\]", "Concise list comprehension pipeline", 22),
+    (r"\[::-1\]", "Pythonic slice reversal shorthand", 20),
+    (r"\b(?:isalnum|isalpha|isdigit)\(\)", "Textbook string classification method", 15),
+    (r"(?s)[\'\"]{3}[\s\S]*?[\'\"]{3}", "Textbook docstring block", 22),
+    (r"\b(?:sum|any|all)\(\s*(?:\[|\()\s*[a-zA-Z_0-9]+.*?for\s+[a-zA-Z_0-9]+\s+in", "Functional built-in with generator/comprehension", 24),
+    (r"\b(?:lambda\s+[a-zA-Z_0-9,\s]+:)", "Lambda function expression", 18),
+    (r"(?:\w+\s+if\s+.*?\s+else\s+\w+)", "Ternary conditional expression", 18),
+    (r"const\s+[a-zA-Z_0-9]+\s*=\s*\([^)]*\)\s*=>", "Modern ES6 arrow function declaration", 20),
+    (r"\.(?:map|filter|reduce)\s*\(", "Chained functional array method", 20),
+    (r"\bstd::make_unique<|\bstd::unique_ptr<|\bstd::shared_ptr<", "Modern C++ smart pointer safety construct", 25),
 ]
 
 UNIVERSAL_NORMALIZER_MATRIX = [
@@ -300,11 +323,17 @@ AI_ARCHETYPE_PATTERNS = [
 ]
 
 def detect_language(filename: str, code: str) -> str:
-    if filename:
+    if filename and filename != "snippet.py" and "." in filename:
         for ext, lang in LANG_EXTENSIONS.items():
             if filename.lower().endswith(ext):
                 return lang
 
+    if re.search(r"(?i)<!DOCTYPE\s+html|<html[\s>]|<head[\s>]|<body[\s>]|<div[\s>]|<header[\s>]", code):
+        return "html"
+    if re.search(r"(?i)\b(?:select\s+.*?\s+from|insert\s+into|create\s+table|update\s+\w+\s+set)\b", code):
+        return "sql"
+    if re.search(r"(?m)^\s*(?:[.#]?[a-zA-Z_0-9-]+\s*\{|@media|@keyframes)", code):
+        return "css"
     if re.search(r"def\s+[a-zA-Z_0-9]+\s*\(.*?\):|import\s+[a-zA-Z_]+", code):
         return "python"
     if re.search(r"function\s+[a-zA-Z_0-9]+\s*\(|const\s+[a-zA-Z_0-9]+\s*=|console\.log", code):
@@ -594,17 +623,46 @@ def detect_ai_code(code: str, filename: str = "snippet.py") -> Dict[str, Any]:
     has_tidy_print = bool(re.search(r'(?i)print\s*\(\s*(?:[a-zA-Z_0-9]+\s*\(|f?["\'])', code))
     is_helpful_assistant = has_main_wrapper and (has_mock_sample or has_tidy_print)
 
+    syntax_score = 0.0
+    syntax_hits = 0
+    for pat, desc, weight in AI_SYNTAX_PATTERNS:
+        matches = re.findall(pat, code)
+        if matches:
+            syntax_hits += len(matches)
+            syntax_score += min(35.0, weight * len(matches))
+            for idx, line in enumerate(lines):
+                if re.search(pat, line):
+                    line_scores[idx] = max(line_scores[idx], min(95.0, weight * 3.5))
+                    if not line_reasons[idx]:
+                        line_reasons[idx] = desc
+                    indicators.append({
+                        "name": "AI Syntactic / Idiomatic Pattern",
+                        "severity": "high" if weight >= 22 else "medium",
+                        "description": f"Found '{desc}' on line {idx + 1}.",
+                        "line": idx + 1,
+                        "code_snippet": line.strip()[:80]
+                    })
+                    break
+    syntax_score = min(45.0, syntax_score)
+
     synergy_bonus = 0.0
     if comment_pattern_hits > 0 and naming_hits >= 2:
         synergy_bonus += 14.0
     if comment_pattern_hits > 0 and scaffold_score > 0:
         synergy_bonus += 12.0
+    if syntax_hits >= 2:
+        synergy_bonus += 15.0
+    if syntax_hits >= 1 and naming_hits >= 1:
+        synergy_bonus += 18.0
 
-    raw_ai_score = comment_score + naming_score + scaffold_score + entropy_score + burst_score + complexity_mismatch + synergy_bonus - human_damping_credit
+    raw_ai_score = comment_score + naming_score + scaffold_score + syntax_score + entropy_score + burst_score + complexity_mismatch + synergy_bonus - human_damping_credit
+
+    if (syntax_hits >= 2 or (syntax_hits >= 1 and naming_hits >= 1)) and human_scars_count == 0:
+        raw_ai_score = max(raw_ai_score, 82.0)
 
     final_score = max(4.0, min(97.5, raw_ai_score))
 
-    if len(non_blank_lines) < 4 and not any("```" in l for l in lines):
+    if len(non_blank_lines) < 4 and not any("```" in l for l in lines) and syntax_hits == 0 and naming_hits == 0 and comment_pattern_hits == 0:
         final_score = min(final_score, 35.0)
 
     final_score = round(final_score, 1)

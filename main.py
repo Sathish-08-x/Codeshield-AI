@@ -61,6 +61,8 @@ class HumanizeRequest(BaseModel):
     flagged_line_numbers: Optional[List[int]] = None
     file_id: Optional[int] = None
     variation_seed: Optional[int] = None
+    academic_year: Optional[str] = "year_1"
+    purpose: Optional[str] = "assignment"
 
 class CloneStyleRequest(BaseModel):
     samples: List[str]
@@ -391,7 +393,9 @@ async def humanize_endpoint(req: HumanizeRequest):
         flagged_line_numbers=req.flagged_line_numbers,
         variation_seed=req.variation_seed,
         persona=req.persona,
-        reference_samples=req.reference_samples
+        reference_samples=req.reference_samples,
+        academic_year=req.academic_year or "year_1",
+        purpose=req.purpose or "assignment"
     )
 
     if req.file_id:
