@@ -332,16 +332,16 @@ def detect_language(filename: str, code: str) -> str:
         return "html"
     if re.search(r"(?i)\b(?:select\s+.*?\s+from|insert\s+into|create\s+table|update\s+\w+\s+set)\b", code):
         return "sql"
-    if re.search(r"(?m)^\s*(?:[.#]?[a-zA-Z_0-9-]+\s*\{|@media|@keyframes)", code):
-        return "css"
-    if re.search(r"def\s+[a-zA-Z_0-9]+\s*\(.*?\):|import\s+[a-zA-Z_]+", code):
-        return "python"
-    if re.search(r"function\s+[a-zA-Z_0-9]+\s*\(|const\s+[a-zA-Z_0-9]+\s*=|console\.log", code):
-        return "javascript"
     if re.search(r"#include\s*<[a-z]+>|std::", code):
         return "cpp"
     if re.search(r"public\s+class\s+[a-zA-Z_0-9]+|System\.out\.println", code):
         return "java"
+    if re.search(r"def\s+[a-zA-Z_0-9]+\s*\(.*?\):|import\s+[a-zA-Z_]+", code):
+        return "python"
+    if re.search(r"(?:\bfunction\s+[a-zA-Z_0-9]+\s*\(|\bconst\s+[a-zA-Z_0-9]+\s*=|console\.(?:log|error|warn)|\bawait\s+fetch\b|\bnew\s+FileReader\b|\bdocument\.(?:getElementById|querySelector))", code):
+        return "javascript"
+    if re.search(r"(?m)^\s*(?!(?:try|catch|finally|if|else|while|for|switch|case|function|class|interface|struct|enum|return)\b)[.#]?[a-zA-Z_0-9-]+\s*\{[^}]*?(?:color|background|font|margin|padding|display|border|width|height)\s*:", code) or re.search(r"@media|@keyframes|:root\s*\{", code):
+        return "css"
     if re.search(r"package\s+main|func\s+[a-zA-Z_0-9]+", code):
         return "go"
     if re.search(r"fn\s+main\s*\(|let\s+mut\s+", code):

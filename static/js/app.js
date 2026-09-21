@@ -2115,9 +2115,9 @@ const calculateDiscount = (orderTotal, discountRate) => {
 
     const vIdx = Math.abs(Number(variationSeed || 0)) % 3;
     const varMaps = [
-      { data_list: 'items', current_item: 'item', total_sum: 'total', calculate_total_sum: 'calc_total', sample_data: 'data', userAuthenticationStatus: 'usr_auth', targetElement: 'el' },
-      { data_list: 'vals', current_item: 'val', total_sum: 'acc', calculate_total_sum: 'compute_total', sample_data: 'records', userAuthenticationStatus: 'usr_auth', targetElement: 'el' },
-      { data_list: 'seq', current_item: 'elem', total_sum: 'sum_val', calculate_total_sum: 'sum_elements', sample_data: 'sample', userAuthenticationStatus: 'usr_auth', targetElement: 'el' }
+      { data_list: 'items', current_item: 'item', total_sum: 'total', calculate_total_sum: 'calc_total', sample_data: 'data', userAuthenticationStatus: 'usr_auth', targetElement: 'el', streamReader: 'f', structuredImagePart: 'imgPart', responseChannel: 'res', runtimeFault: 'err', base64ImageData: 'b64', base64Image: 'b64' },
+      { data_list: 'vals', current_item: 'val', total_sum: 'acc', calculate_total_sum: 'compute_total', sample_data: 'records', userAuthenticationStatus: 'usr_auth', targetElement: 'el', streamReader: 'f', structuredImagePart: 'imgPart', responseChannel: 'res', runtimeFault: 'err', base64ImageData: 'b64', base64Image: 'b64' },
+      { data_list: 'seq', current_item: 'elem', total_sum: 'sum_val', calculate_total_sum: 'sum_elements', sample_data: 'sample', userAuthenticationStatus: 'usr_auth', targetElement: 'el', streamReader: 'f', structuredImagePart: 'imgPart', responseChannel: 'res', runtimeFault: 'err', base64ImageData: 'b64', base64Image: 'b64' }
     ];
     const m = varMaps[vIdx];
 
@@ -3124,6 +3124,15 @@ const calculateDiscount = (orderTotal, discountRate) => {
       cleaned = cleaned.replace(/ class="hero-description"/g, '');
       cleaned = cleaned.replace(/<html lang="en">/g, '<html>');
 
+      // Rule 1: Eliminated "AI Design Systems" (CSS)
+      cleaned = cleaned.replace(/--[a-zA-Z0-9_-]+:\s*[^;]+;\n?/g, '');
+      cleaned = cleaned.replace(/box-shadow:\s*[^;]+;/g, 'box-shadow: none;');
+      cleaned = cleaned.replace(/border-radius:\s*[^;]+;/g, 'border-radius: 0;');
+      cleaned = cleaned.replace(/font-family:\s*[^;]+;/g, 'font-family: monospace;');
+      cleaned = cleaned.replace(/background:\s*(?:linear-gradient[^;]+|#fff(?:fff)?|white);/gi, 'background: #111; color: #eee;');
+      cleaned = cleaned.replace(/((?:button|\.btn|\.cta-button)[^{]*\{[^}]*?background:)\s*[^;]+;/g, '$1 #e53e3e; color: #fff; border: 1px solid #ff0000;');
+      changes.push("Eliminated AI design systems: stripped CSS vars, shadows, and border-radiuses for raw testing box styling [Rule 1]");
+
       // Pillar 4: Natural Developer Noise
       cleaned = "<!-- TODO: integrate sticky behavior on window scroll later -->\n" + cleaned;
       changes.push("Pass 3: Injected natural developer checklist comment [Pillar 4]");
@@ -3190,6 +3199,43 @@ const calculateDiscount = (orderTotal, discountRate) => {
       changes.push("Unpacked `for...of` cart iteration into indexed loop with `currentItem` intermediate variable [Step 2]");
     }
 
+    // Rule 6: Added Scrappy Developer Artifacts (// FIXME: api key exposed, change later)
+    const apiKeyReg = /^(\s*)(?:const|let|var)\s+([a-zA-Z_0-9]*(?:API_KEY|apiKey|api_key|KEY|SECRET|token)[a-zA-Z_0-9]*)\s*=/m;
+    if (apiKeyReg.test(cleaned) && !cleaned.includes('api key exposed')) {
+      cleaned = cleaned.replace(apiKeyReg, "$1// FIXME: api key exposed, change later\n$1var $2 =");
+      changes.push("Injected realistic shorthand comment `// FIXME: api key exposed, change later` above config [Rule 6]");
+    }
+
+    // Rule 4: Mixed Syntax Eras (Old vs. New) - Convert modern const to traditional var
+    const constToVar = [
+      [/^(\s*)const\s+([a-zA-Z_0-9]+)\s*=\s*(document\.(?:getElementById|querySelector)[^;\n]+;)/gm, "$1var $2 = $3"],
+      [/^(\s*)const\s+([a-zA-Z_0-9]+)\s*=\s*(new\s+(?:FileReader|Image|XMLHttpRequest)[^;\n]+;)/gm, "$1var $2 = $3"],
+      [/^(\s*)const\s+([a-zA-Z_0-9]*(?:API_KEY|apiKey|api_key|KEY|SECRET|CONFIG|cfg)[a-zA-Z_0-9]*)\s*=/gm, "$1var $2 ="],
+      [/^(\s*)const\s+(taxRate|tax_rate|total|subtotal|finalSum|price|discount)\s*=/gm, "$1var $2 ="]
+    ];
+    for (let [pat, repl] of constToVar) {
+      if (pat.test(cleaned)) {
+        cleaned = cleaned.replace(pat, repl);
+        changes.push("Switched modern `const` to traditional `var` out of old-school developer muscle memory [Rule 4]");
+      }
+    }
+
+    // Rule 5: Dropped Short, Frustrated Error Strings
+    const errorReplacements = [
+      [/(['"])Please select an? (?:valid )?image(?: file)?\.?\1/gi, '"Error: no image selected!"'],
+      [/(['"])No image selected\.?\1/gi, '"Error: no image selected!"'],
+      [/(['"])An unexpected (?:runtime )?error occurred(?:\. Please try again)?\.?\1/gi, '"Something broke!"'],
+      [/(['"])Failed to (?:process|fetch|execute)(?: request| image)?\.?\1/gi, '"Something broke!"'],
+      [/(['"])Error occurred while (?:processing|fetching|loading).*?\1/gi, '"Something broke!"'],
+      [/(['"])An error occurred while (?:generating|analyzing).*?\1/gi, '"Something broke!"']
+    ];
+    for (let [pat, repl] of errorReplacements) {
+      if (pat.test(cleaned)) {
+        cleaned = cleaned.replace(pat, repl);
+        changes.push("Replaced corporate error message with blunt developer phrasing [Rule 5]");
+      }
+    }
+
     // 4. Java Generic try/catch -> Contextual logging with fallback defaults
     const javaTryCatch = /catch\s*\(\s*FileNotFoundException\s+(\w+)\s*\)\s*\{\s*System\.out\.println\(\s*"An error occurred\."\s*\);\s*\1\.printStackTrace\(\);\s*\}/s;
     if (javaTryCatch.test(cleaned)) {
@@ -3208,6 +3254,10 @@ const calculateDiscount = (orderTotal, discountRate) => {
     cleaned = cleaned.replace(/'''[\s\S]*?'''/g, '');
     cleaned = cleaned.replace(/\/\*[\s\S]*?\*\//g, '');
     cleaned = cleaned.replace(/<!--[\s\S]*?-->/g, '');
+
+    // Rule 3: Erased Tutorial-Style Documentation Comments
+    cleaned = cleaned.replace(/(?:\/\/|#|\/\*)\s*(?:UI|Pipeline|Execution|Configuration|Setup|Component|Main|Core)\s+Logic\s*:?.*?(?:\*\/|\n|$)/gi, '\n');
+    cleaned = cleaned.replace(/(?:\/\/|#)\s*={3,}\s*(?:UI|Pipeline|Execution|Logic|Config).*/gi, '');
     changes.push("Stage 1: Stripped 100% of AI comments and docstring boilerplate");
 
     // Strip single-line comments
@@ -3295,7 +3345,19 @@ const calculateDiscount = (orderTotal, discountRate) => {
       [/\buserAuthenticationStatus\b/g, "usr_auth"],
       [/\buser_authentication_status\b/g, "usr_auth"],
       [/\btargetElement\b/g, "el"],
-      [/\btarget_element\b/g, "el"]
+      [/\btarget_element\b/g, "el"],
+      [/\bstreamReader\b/g, "f"],
+      [/\bstream_reader\b/g, "f"],
+      [/\bstructuredImagePart\b/g, "imgPart"],
+      [/\bstructured_image_part\b/g, "imgPart"],
+      [/\bresponseChannel\b/g, "res"],
+      [/\bresponse_channel\b/g, "res"],
+      [/\bruntimeFault\b/g, "err"],
+      [/\bruntime_fault\b/g, "err"],
+      [/\bbase64ImageData\b/g, "b64"],
+      [/\bbase64_image_data\b/g, "b64"],
+      [/\bbase64Image\b/g, "b64"],
+      [/\bbase64_image\b/g, "b64"]
     ];
     for (let [pat, repl] of studentVars) {
       if (pat.test(cleaned)) {
